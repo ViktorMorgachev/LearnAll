@@ -28,8 +28,13 @@ class WordsRepositoryAdapter(private val items: List<WordItem>) :
         holder.binding!!.word = items[position]
     }
 
-    inner class WordsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var binding = DataBindingUtil.bind<ItemWordBinding>(itemView)
+    inner class WordsHolder : RecyclerView.ViewHolder {
+        constructor(itemView: View) : super(itemView) {
+            this.binding = DataBindingUtil.bind<ItemWordBinding>(itemView)
+            binding!!.executePendingBindings()
+        }
+
+        var binding: ItemWordBinding?
     }
 
 }
