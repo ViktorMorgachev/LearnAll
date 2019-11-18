@@ -16,13 +16,13 @@
             android:background="@android:color/darker_gray"
             android:orientation="horizontal">
 
-
             <TextView
                 android:id="@+id/tv_other_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:gravity="center"
+                android:text="@{Word.nativeName}"
                 android:textColor="@android:color/black"
                 android:textSize="25sp"
                 tools:text="Girl" />
@@ -40,6 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:gravity="center"
+                android:text="@{Word.otherName}"
                 android:textColor="@android:color/black"
                 android:textSize="25sp"
                 tools:text="Девочка" />
@@ -55,6 +56,12 @@
             android:background="@android:color/holo_green_light" />
 
     </androidx.cardview.widget.CardView>
+
+    <data>
+        <variable
+            name="Word"
+            type="com.sedi.viktor.learnAll.models.WordItem" />
+    </data>
 
 </layout>
 
