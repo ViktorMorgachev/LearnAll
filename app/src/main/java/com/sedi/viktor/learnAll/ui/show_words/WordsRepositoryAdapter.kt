@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.sedi.viktor.learnAll.databinding.ItemWordLayoutBinding
+import com.sedi.viktor.learnAll.databinding.ItemWordBinding
 import com.sedi.viktor.learnAll.models.WordItem
 
 class WordsRepositoryAdapter(private val items: List<WordItem>) :
@@ -17,7 +17,7 @@ class WordsRepositoryAdapter(private val items: List<WordItem>) :
         viewType: Int
     ): WordsHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemWordLayoutBinding.inflate(inflater, parent, false)
+        val binding = ItemWordBinding.inflate(inflater, parent, false)
         return WordsHolder(binding.root)
     }
 
@@ -29,7 +29,7 @@ class WordsRepositoryAdapter(private val items: List<WordItem>) :
     }
 
     inner class WordsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var binding = DataBindingUtil.bind<ItemWordLayoutBinding>(itemView)
+        var binding = DataBindingUtil.bind<ItemWordBinding>(itemView)
     }
 
 }
