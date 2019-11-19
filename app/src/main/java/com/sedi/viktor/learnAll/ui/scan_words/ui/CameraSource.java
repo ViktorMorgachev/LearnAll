@@ -255,7 +255,7 @@ public class CameraSource {
     //==============================================================================================
 
     /**
-     * Callback interface used to signal the moment of actual image capture.
+     * Callback interface used to signal the moment of actual image capture_layout.
      */
     public interface ShutterCallback {
         /**
@@ -268,7 +268,7 @@ public class CameraSource {
     }
 
     /**
-     * Callback interface used to supply image data from a photo capture.
+     * Callback interface used to supply image data from a photo capture_layout.
      */
     public interface PictureCallback {
         /**
@@ -491,7 +491,7 @@ public class CameraSource {
      * preview is suspended while the picture is being taken, but will resume once picture taking is
      * done.
      *
-     * @param shutter the callback for image capture moment, or null
+     * @param shutter the callback for image capture_layout moment, or null
      * @param jpeg    the callback for JPEG image data, or null
      */
     public void takePicture(ShutterCallback shutter, PictureCallback jpeg) {

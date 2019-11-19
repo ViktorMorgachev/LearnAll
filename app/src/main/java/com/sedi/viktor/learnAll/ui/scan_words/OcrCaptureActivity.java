@@ -38,6 +38,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.sedi.viktor.learnAll.R;
 import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSource;
 import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSourcePreview;
+import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay;
 
 import java.io.IOException;
 
@@ -62,7 +63,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
     private CameraSource cameraSource;
     private CameraSourcePreview preview;
-    private com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay<OcrGraphic> graphicOverlay;
+    private GraphicOverlay<OcrGraphic> graphicOverlay;
 
     // Helper objects for detecting taps and pinches.
     private ScaleGestureDetector scaleGestureDetector;
@@ -75,7 +76,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(R.layout.capture);
+        setContentView(R.layout.capture_layout);
 
         preview = (CameraSourcePreview) findViewById(R.id.preview);
         graphicOverlay = findViewById(R.id.graphicOverlay);
