@@ -51,7 +51,7 @@ android {
     }
 
     dependencies {
-
+        implementation 'com.google.android.gms:play-services-vision:19.0.0'
         implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
         implementation fileTree(dir: 'libs', include: ['*.jar'])
         implementation "androidx.cardview:cardview:$cardview_version"
