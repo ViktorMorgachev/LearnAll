@@ -3,6 +3,7 @@ package com.sedi.viktor.learnAll.ui.scan_words
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -24,6 +25,11 @@ class CaptureActivity : AppCompatActivity() {
     lateinit var gestureDetector: GestureDetector
     lateinit var scaleDetector: ScaleGestureDetector
     var cameraSource: CameraSource? = null
+
+    companion object {
+        const val AutoFocusExtra = "AutoFocus"
+        const val UseFlashExtra = "UseFlash"
+    }
 
 
     // Intent request code to handle updating play services if needed.
@@ -57,10 +63,25 @@ class CaptureActivity : AppCompatActivity() {
         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
             ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERMISSION)
         }
-
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
 
+        if (requestCode != RC_HANDLE_CAMERA_PERMISSION)
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            val autofocus = intent.getBooleanExtra(AutoFocusExtra, false)
+            val useFlash = intent.getBooleanExtra(UseFlashExtra, false)
+            createCameraSource(autofocus, useFlash)
+        }
+
+
+    }
 
     private fun startCameraSource() {
 
@@ -75,18 +96,15 @@ class CaptureActivity : AppCompatActivity() {
 
                 if (cameraSource != null) {
                     try {
-                      //  preview.start(cameraSource, graphicOverlay)
+                        //  preview.start(cameraSource, graphicOverlay)
                     } catch (e: IOException) {
                         cameraSource!!.release()
                         cameraSource = null
 
                     }
                 }
-
-
             }
         }
-
     }
 
     override fun onResume() {
@@ -111,12 +129,12 @@ class CaptureActivity : AppCompatActivity() {
     private fun createCameraSource(autofocus: Boolean, useFlash: Boolean) {
         val context = applicationContext
 
+
         // TODO: Create the TextRecognizer
-        // TODO: Set the TextRecognizer's Processor.
-
+        // TODO: Set the TextRecognizer's Processor
         // TODO: Check if the TextRecognizer is operational.
+        // TODO: Create the cameraSource using the TextRecognizer
 
-        // TODO: Create the cameraSource using the TextRecognizer.
     }
 
 
@@ -149,9 +167,7 @@ class CaptureActivity : AppCompatActivity() {
         }
     }
 
-
     private inner class ScaleDetectorListener : ScaleGestureDetector.OnScaleGestureListener {
-
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             return false

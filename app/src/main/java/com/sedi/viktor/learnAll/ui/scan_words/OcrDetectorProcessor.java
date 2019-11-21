@@ -20,13 +20,13 @@ package com.sedi.viktor.learnAll.ui.scan_words;/*
  * as OcrGraphics.
  * TODO: Make this implement Detector.Processor<TextBlock> and add text to the GraphicOverlay
  */
-public class OcrDetectorProcessor {
+/*public class OcrDetectorProcessor {
 
-    private com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay<OcrGraphic> graphicOverlay;
+    private <O> graphicOverlay;
 
-  /*  OcrDetectorProcessor(GraphicOverlay<OcrGraphic> ocrGraphicOverlay) {
+  *//*  OcrDetectorProcessor(GraphicOverlay<OcrGraphic> ocrGraphicOverlay) {
         graphicOverlay = ocrGraphicOverlay;
-    }*/
+    }*//*
 
     // TODO:  Once this implements Detector.Processor<TextBlock>, implement the abstract methods.
-}
+}*/
