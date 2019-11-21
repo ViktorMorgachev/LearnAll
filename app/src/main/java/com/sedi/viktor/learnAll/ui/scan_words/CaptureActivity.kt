@@ -8,9 +8,14 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.sedi.viktor.learnAll.R
+import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSource
 import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSourcePreview
 import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay
+import kotlinx.android.synthetic.main.capture_layout.*
+import java.io.IOException
 
 class CaptureActivity : AppCompatActivity() {
 
@@ -18,7 +23,11 @@ class CaptureActivity : AppCompatActivity() {
     lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
     lateinit var gestureDetector: GestureDetector
     lateinit var scaleDetector: ScaleGestureDetector
+    var cameraSource: CameraSource? = null
 
+
+    // Intent request code to handle updating play services if needed.
+    private val RC_HANDLE_GMS = 9001
     // Permission request codes need to be < 256
     private val RC_HANDLE_CAMERA_PERMISSION = 2
 
@@ -50,6 +59,66 @@ class CaptureActivity : AppCompatActivity() {
         }
 
     }
+
+
+
+    private fun startCameraSource() {
+
+        val code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
+            applicationContext
+        )
+        when (code) {
+            ConnectionResult.SUCCESS -> {
+                GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS).show()
+            }
+            else -> {
+
+                if (cameraSource != null) {
+                    try {
+                      //  preview.start(cameraSource, graphicOverlay)
+                    } catch (e: IOException) {
+                        cameraSource!!.release()
+                        cameraSource = null
+
+                    }
+                }
+
+
+            }
+        }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startCameraSource();
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (preview != null) {
+            preview.stop()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (preview != null) {
+            preview.release()
+        }
+    }
+
+    private fun createCameraSource(autofocus: Boolean, useFlash: Boolean) {
+        val context = applicationContext
+
+        // TODO: Create the TextRecognizer
+        // TODO: Set the TextRecognizer's Processor.
+
+        // TODO: Check if the TextRecognizer is operational.
+
+        // TODO: Create the cameraSource using the TextRecognizer.
+    }
+
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
 
