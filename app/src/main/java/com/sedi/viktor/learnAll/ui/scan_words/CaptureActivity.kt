@@ -1,9 +1,10 @@
 package com.sedi.viktor.learnAll.ui.scan_words
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.camera2.CameraManager
 import android.os.Bundle
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -20,10 +21,18 @@ import java.io.IOException
 
 class CaptureActivity : AppCompatActivity() {
 
+    // Viewss
     lateinit var cameraSourcePreview: CameraSourcePreview
     lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
+
+    // Managers
     lateinit var gestureDetector: GestureDetector
     lateinit var scaleDetector: ScaleGestureDetector
+    lateinit var cameraManager: CameraManager
+
+    // Data
+    lateinit var myCameras: List<String>
+
     var cameraSource: CameraSource? = null
 
     companion object {
@@ -44,12 +53,15 @@ class CaptureActivity : AppCompatActivity() {
 
         cameraSourcePreview = findViewById(R.id.preview)
         graphicOverlay = findViewById(R.id.graphicOverlay)
+        cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
 
         val rc = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
 
         if (rc != PackageManager.PERMISSION_GRANTED) {
-            requestCameraPermission();
+            requestCameraPermission()
+        } else {
+            myCameras = cameraManager.cameraIdList.asList()
         }
 
         gestureDetector = GestureDetector(this, CaptureGestureListener())
@@ -77,7 +89,11 @@ class CaptureActivity : AppCompatActivity() {
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             val autofocus = intent.getBooleanExtra(AutoFocusExtra, false)
             val useFlash = intent.getBooleanExtra(UseFlashExtra, false)
-            createCameraSource(autofocus, useFlash)
+
+            myCameras = cameraManager.cameraIdList.asList()
+
+
+            // createCameraSource(autofocus, useFlash)
         }
 
 
