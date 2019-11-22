@@ -104,20 +104,17 @@ class CaptureActivity : AppCompatActivity() {
         val code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
             applicationContext
         )
-        when (code) {
-            ConnectionResult.SUCCESS -> {
-                GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS).show()
-            }
-            else -> {
 
-                if (cameraSource != null) {
-                    try {
-                        //  preview.start(cameraSource, graphicOverlay)
-                    } catch (e: IOException) {
-                        cameraSource!!.release()
-                        cameraSource = null
+        if (code != ConnectionResult.SUCCESS)
+            GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS).show()
+        else {
+            if (cameraSource != null) {
+                try {
+                    //  preview.start(cameraSource, graphicOverlay)
+                } catch (e: IOException) {
+                    cameraSource!!.release()
+                    cameraSource = null
 
-                    }
                 }
             }
         }
