@@ -16,30 +16,35 @@ import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSource
 import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSourcePreview
 import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay
-import kotlinx.android.synthetic.main.capture_layout.*
 import java.io.IOException
 
 class CaptureActivity : AppCompatActivity() {
 
-    // Viewss
-    lateinit var cameraSourcePreview: CameraSourcePreview
-    lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
+    // Views
+    private lateinit var cameraSourcePreview: CameraSourcePreview
+    private lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
 
     // Managers
-    lateinit var gestureDetector: GestureDetector
-    lateinit var scaleDetector: ScaleGestureDetector
-    lateinit var cameraManager: CameraManager
+    private lateinit var gestureDetector: GestureDetector
+    private lateinit var scaleDetector: ScaleGestureDetector
+    private lateinit var cameraManager: CameraManager
+
 
     // Data
-    lateinit var myCameras: List<String>
+    private lateinit var myCameras: List<String>
+    private lateinit var cameraServices: ArrayList<CameraService>
 
-    var cameraSource: CameraSource? = null
+    //var cameraSource: CameraSource? = null
+
+
+    // Callbacks
+    lateinit var cameraOpenedCallback: CameraService.CameraOpenedCallback
+
 
     companion object {
         const val AutoFocusExtra = "AutoFocus"
         const val UseFlashExtra = "UseFlash"
     }
-
 
     // Intent request code to handle updating play services if needed.
     private val RC_HANDLE_GMS = 9001
@@ -53,8 +58,13 @@ class CaptureActivity : AppCompatActivity() {
 
         cameraSourcePreview = findViewById(R.id.preview)
         graphicOverlay = findViewById(R.id.graphicOverlay)
+
+
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
+
+
+        initCallbacks()
 
         val rc = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
 
@@ -62,11 +72,22 @@ class CaptureActivity : AppCompatActivity() {
             requestCameraPermission()
         } else {
             myCameras = cameraManager.cameraIdList.asList()
+
+            cameraServices.add(CameraService(myCameras[0], cameraManager, cameraOpenedCallback))
         }
 
         gestureDetector = GestureDetector(this, CaptureGestureListener())
         scaleDetector = ScaleGestureDetector(this, ScaleDetectorListener())
 
+    }
+
+    private fun initCallbacks() {
+        cameraOpenedCallback = object : CameraService.CameraOpenedCallback {
+            override fun createCameraPreviewSession() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+        }
     }
 
     private fun requestCameraPermission() {
@@ -108,7 +129,7 @@ class CaptureActivity : AppCompatActivity() {
         if (code != ConnectionResult.SUCCESS)
             GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS).show()
         else {
-            if (cameraSource != null) {
+           /* if (cameraSource != null) {
                 try {
                     //  preview.start(cameraSource, graphicOverlay)
                 } catch (e: IOException) {
@@ -116,26 +137,29 @@ class CaptureActivity : AppCompatActivity() {
                     cameraSource = null
 
                 }
-            }
+            }*/
         }
     }
 
     override fun onResume() {
         super.onResume()
-        startCameraSource();
+        if (cameraServices.size > 0) {
+            cameraServices[0].openCamera(this)
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        if (preview != null) {
-            preview.stop()
+        if (cameraServices.size > 0) {
+            cameraServices[0].closeCamera()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (preview != null) {
-            preview.release()
+        if (cameraServices.size > 0) {
+            cameraServices[0].closeCamera()
+            cameraServices = ArrayList();
         }
     }
 
@@ -195,6 +219,12 @@ class CaptureActivity : AppCompatActivity() {
             //   cameraSource.doZoom(detector.scaleFactor)
             // }
         }
+    }
+
+
+    enum class CameraType(val type: Int) {
+        CAMERA_BACK(0),
+        CAMERA_FRONT(1)
     }
 
 }
