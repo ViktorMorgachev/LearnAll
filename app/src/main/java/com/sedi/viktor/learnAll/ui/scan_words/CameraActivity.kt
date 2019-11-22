@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraManager
 import android.os.Bundle
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.ConnectionResult
@@ -18,7 +16,7 @@ import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSourcePreview
 import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay
 import java.io.IOException
 
-class CaptureActivity : AppCompatActivity() {
+class CameraActivity : AppCompatActivity() {
 
     // Views
     private lateinit var cameraSourcePreview: CameraSourcePreview
@@ -32,7 +30,7 @@ class CaptureActivity : AppCompatActivity() {
 
     // Data
     private lateinit var myCameras: List<String>
-    private lateinit var cameraServices: ArrayList<CameraService>
+    private  var cameraServices: ArrayList<CameraService> = ArrayList<CameraService>()
 
     //var cameraSource: CameraSource? = null
 
@@ -54,10 +52,17 @@ class CaptureActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+
         setContentView(R.layout.capture_layout)
 
-        cameraSourcePreview = findViewById(R.id.preview)
-        graphicOverlay = findViewById(R.id.graphicOverlay)
+      /*  cameraSourcePreview = findViewById(R.id.preview)
+        graphicOverlay = findViewById(R.id.graphicOverlay)*/
 
 
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -84,7 +89,9 @@ class CaptureActivity : AppCompatActivity() {
     private fun initCallbacks() {
         cameraOpenedCallback = object : CameraService.CameraOpenedCallback {
             override fun createCameraPreviewSession() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+               // val surfaceTexture =
+
             }
 
         }
