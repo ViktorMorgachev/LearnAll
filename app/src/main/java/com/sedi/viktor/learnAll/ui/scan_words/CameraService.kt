@@ -7,12 +7,14 @@ import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.view.Surface
+import com.google.android.gms.vision.text.TextRecognizer
 
 class CameraService {
     private var cameraID: String
     private var cameraDevice: CameraDevice? = null
     private lateinit var cameraCaptureSession: CameraCaptureSession
     private var cameraManager: CameraManager
+    private lateinit var textRecognizer: TextRecognizer
     private lateinit var cameraOpenedCallback: CameraOpenedCallback
 
 
@@ -43,10 +45,12 @@ class CameraService {
             object : CameraActivity.CreateCameraPreviewSessionCallback {
                 override fun createCameraPreviewSession(
                     surface: Surface,
-                    cameraCaptureSession: CameraCaptureSession
+                    cameraCaptureSession: CameraCaptureSession,
+                    textRecognizer: TextRecognizer
                 ) {
                     this@CameraService.surface = surface
                     this@CameraService.cameraCaptureSession = cameraCaptureSession
+                    this@CameraService.textRecognizer = textRecognizer
                 }
 
             }
@@ -80,6 +84,8 @@ class CameraService {
                 camera,
                 this@CameraService.createCameraPreviewSessionCallback
             )
+
+
         }
 
         override fun onDisconnected(camera: CameraDevice) {

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.vision.text.TextRecognizer
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSourcePreview
 import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay
@@ -23,11 +24,12 @@ class CameraActivity : AppCompatActivity() {
     // Views
     private lateinit var cameraSourcePreview: CameraSourcePreview
     private lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
-
     private lateinit var texture: TextureView
 
 
     // Managers
+    private lateinit var textRecognizer: TextRecognizer
+    //  private lateinit var : Detector.Processor
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleDetector: ScaleGestureDetector
     private lateinit var cameraManager: CameraManager
@@ -100,12 +102,15 @@ class CameraActivity : AppCompatActivity() {
                 cameraPreviewSessionCallback: CreateCameraPreviewSessionCallback
             ) {
 
-                val surface = Surface(texture.surfaceTexture)
+                texture.surfaceTexture.setDefaultBufferSize(1920, 1080)
 
+                val surface = Surface(texture.surfaceTexture)
                 try {
                     val captureRequestBuilder =
                         cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                     captureRequestBuilder.addTarget(surface)
+
+                    // cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW, captureRequestBuilder)
 
                     cameraDevice.createCaptureSession(
                         listOf(surface),
@@ -116,7 +121,8 @@ class CameraActivity : AppCompatActivity() {
 
                                 cameraPreviewSessionCallback.createCameraPreviewSession(
                                     surface,
-                                    session
+                                    session,
+                                    initTextRecognizer()
                                 )
 
                                 session.setRepeatingRequest(
@@ -124,6 +130,7 @@ class CameraActivity : AppCompatActivity() {
                                     null,
                                     null
                                 )
+
 
                             }
 
@@ -137,6 +144,21 @@ class CameraActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun initTextRecognizer(): TextRecognizer {
+        textRecognizer = TextRecognizer.Builder(this).build()
+
+        if (textRecognizer.isOperational) {
+
+
+        } else {
+            // Check for low storage.  If there is low storage, the native library will not be
+            // downloaded, so detection will not become operational.
+        }
+
+        return textRecognizer
+
     }
 
     private fun requestCameraPermission() {
@@ -200,7 +222,7 @@ class CameraActivity : AppCompatActivity() {
         super.onDestroy()
         if (cameraServices.size > 0) {
             cameraServices[0].closeCamera()
-            cameraServices = ArrayList();
+            cameraServices = ArrayList()
         }
     }
 
@@ -273,8 +295,11 @@ class CameraActivity : AppCompatActivity() {
      * Callback через который передадим surface и cameraCaptureSession в CameraService  после их инициализации
      */
     interface CreateCameraPreviewSessionCallback {
-        fun createCameraPreviewSession(surface: Surface, cameraCaptureSession: CameraCaptureSession)
-
+        fun createCameraPreviewSession(
+            surface: Surface,
+            cameraCaptureSession: CameraCaptureSession,
+            textRecognizer: TextRecognizer
+        )
     }
 
 }
