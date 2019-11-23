@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.view.Surface
 
 class CameraService {
     private var cameraID: String
@@ -23,6 +24,32 @@ class CameraService {
         this.cameraID = cameraID
         this.cameraManager = cameraManager
         this.cameraOpenedCallback = cameraOpenedCallback
+
+        initCallbacks()
+
+    }
+
+
+    // View
+    private lateinit var surface: Surface
+
+
+    // Callbacks
+    private lateinit var createCameraPreviewSessionCallback: CameraActivity.CreateCameraPreviewSessionCallback
+
+
+    private fun initCallbacks() {
+        createCameraPreviewSessionCallback =
+            object : CameraActivity.CreateCameraPreviewSessionCallback {
+                override fun createCameraPreviewSession(
+                    surface: Surface,
+                    cameraCaptureSession: CameraCaptureSession
+                ) {
+                    this@CameraService.surface = surface
+                    this@CameraService.cameraCaptureSession = cameraCaptureSession
+                }
+
+            }
     }
 
     fun isOpen(): Boolean {
@@ -49,7 +76,10 @@ class CameraService {
 
         override fun onOpened(camera: CameraDevice) {
             cameraDevice = camera
-            cameraOpenedCallback.createCameraPreviewSession()
+            cameraOpenedCallback.createCameraPreviewSession(
+                camera,
+                this@CameraService.createCameraPreviewSessionCallback
+            )
         }
 
         override fun onDisconnected(camera: CameraDevice) {
@@ -64,8 +94,15 @@ class CameraService {
     }
 
 
+    /**
+     * После открытия камеры, через этот Кэлбэк в активности создаём createCaptureRequest и связывем текущий cameraDevice c Surface
+     * и передаём колбек через который проинициализируем уже готовые CameraCaptureSession и surface
+     */
     interface CameraOpenedCallback {
-        fun createCameraPreviewSession()
+        fun createCameraPreviewSession(
+            cameraDevice: CameraDevice,
+            cameraPreviewSessionCallback: CameraActivity.CreateCameraPreviewSessionCallback
+        )
     }
 
 

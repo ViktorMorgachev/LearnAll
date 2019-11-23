@@ -3,6 +3,9 @@ package com.sedi.viktor.learnAll.ui.scan_words
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.os.Bundle
 import android.view.*
@@ -11,16 +14,18 @@ import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.sedi.viktor.learnAll.R
-import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSource
 import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSourcePreview
 import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay
-import java.io.IOException
+
 
 class CameraActivity : AppCompatActivity() {
 
     // Views
     private lateinit var cameraSourcePreview: CameraSourcePreview
     private lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
+
+    private lateinit var texture: TextureView
+
 
     // Managers
     private lateinit var gestureDetector: GestureDetector
@@ -30,7 +35,7 @@ class CameraActivity : AppCompatActivity() {
 
     // Data
     private lateinit var myCameras: List<String>
-    private  var cameraServices: ArrayList<CameraService> = ArrayList<CameraService>()
+    private var cameraServices: ArrayList<CameraService> = ArrayList<CameraService>()
 
     //var cameraSource: CameraSource? = null
 
@@ -61,13 +66,14 @@ class CameraActivity : AppCompatActivity() {
 
         setContentView(R.layout.capture_layout)
 
-      /*  cameraSourcePreview = findViewById(R.id.preview)
-        graphicOverlay = findViewById(R.id.graphicOverlay)*/
 
+        texture = findViewById(R.id.textureView)
+
+
+        /*cameraSourcePreview = findViewById(R.id.preview)
+          graphicOverlay = findViewById(R.id.graphicOverlay)*/
 
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
-
-
 
         initCallbacks()
 
@@ -84,16 +90,52 @@ class CameraActivity : AppCompatActivity() {
         gestureDetector = GestureDetector(this, CaptureGestureListener())
         scaleDetector = ScaleGestureDetector(this, ScaleDetectorListener())
 
+
     }
 
     private fun initCallbacks() {
         cameraOpenedCallback = object : CameraService.CameraOpenedCallback {
-            override fun createCameraPreviewSession() {
+            override fun createCameraPreviewSession(
+                cameraDevice: CameraDevice,
+                cameraPreviewSessionCallback: CreateCameraPreviewSessionCallback
+            ) {
 
-               // val surfaceTexture =
+                val surface = Surface(texture.surfaceTexture)
 
+                try {
+                    val captureRequestBuilder =
+                        cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                    captureRequestBuilder.addTarget(surface)
+
+                    cameraDevice.createCaptureSession(
+                        listOf(surface),
+                        object : CameraCaptureSession.StateCallback() {
+                            override fun onConfigureFailed(session: CameraCaptureSession) {}
+
+                            override fun onConfigured(session: CameraCaptureSession) {
+
+                                cameraPreviewSessionCallback.createCameraPreviewSession(
+                                    surface,
+                                    session
+                                )
+
+                                session.setRepeatingRequest(
+                                    captureRequestBuilder.build(),
+                                    null,
+                                    null
+                                )
+
+                            }
+
+                        },
+                        null
+                    )
+
+
+                } catch (e: CameraAccessException) {
+                    e.printStackTrace()
+                }
             }
-
         }
     }
 
@@ -136,15 +178,7 @@ class CameraActivity : AppCompatActivity() {
         if (code != ConnectionResult.SUCCESS)
             GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS).show()
         else {
-           /* if (cameraSource != null) {
-                try {
-                    //  preview.start(cameraSource, graphicOverlay)
-                } catch (e: IOException) {
-                    cameraSource!!.release()
-                    cameraSource = null
 
-                }
-            }*/
         }
     }
 
@@ -232,6 +266,15 @@ class CameraActivity : AppCompatActivity() {
     enum class CameraType(val type: Int) {
         CAMERA_BACK(0),
         CAMERA_FRONT(1)
+    }
+
+
+    /**
+     * Callback через который передадим surface и cameraCaptureSession в CameraService  после их инициализации
+     */
+    interface CreateCameraPreviewSessionCallback {
+        fun createCameraPreviewSession(surface: Surface, cameraCaptureSession: CameraCaptureSession)
+
     }
 
 }
