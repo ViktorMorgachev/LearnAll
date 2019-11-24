@@ -1,49 +1,40 @@
 package com.sedi.viktor.learnAll.ui.scan_words
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.camera2.CameraAccessException
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraDevice
-import android.hardware.camera2.CameraManager
+import android.graphics.Matrix
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.util.Rational
+import android.util.Size
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.CameraX
+import androidx.camera.core.Preview
+import androidx.camera.core.PreviewConfig
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.vision.text.TextRecognizer
 import com.sedi.viktor.learnAll.R
-import com.sedi.viktor.learnAll.ui.scan_words.ui.CameraSourcePreview
-import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay
+import java.security.acl.Owner
+import java.util.concurrent.Executors
 
 
-class CameraActivity : AppCompatActivity() {
-
-    // Views
-    private lateinit var cameraSourcePreview: CameraSourcePreview
-    private lateinit var graphicOverlay: GraphicOverlay<OcrGraphic>
-    private lateinit var texture: TextureView
+class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
 
     // Managers
     private lateinit var textRecognizer: TextRecognizer
+
+
+    // Views
+    private lateinit var textureView: TextureView
+
     //  private lateinit var : Detector.Processor
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleDetector: ScaleGestureDetector
-    private lateinit var cameraManager: CameraManager
-
-
-    // Data
-    private lateinit var myCameras: List<String>
-    private var cameraServices: ArrayList<CameraService> = ArrayList<CameraService>()
-
-    //var cameraSource: CameraSource? = null
-
-
-    // Callbacks
-    lateinit var cameraOpenedCallback: CameraService.CameraOpenedCallback
+    private lateinit var lifeCycleOwner: Owner
+    private val executor = Executors.newSingleThreadExecutor()
 
 
     companion object {
@@ -68,26 +59,21 @@ class CameraActivity : AppCompatActivity() {
 
         setContentView(R.layout.capture_layout)
 
+        textureView = findViewById(R.id.textureView)
 
-        texture = findViewById(R.id.textureView)
 
-
-        /*cameraSourcePreview = findViewById(R.id.preview)
-          graphicOverlay = findViewById(R.id.graphicOverlay)*/
-
-        cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
-
-        initCallbacks()
+        textureView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateTransform()
+        }
 
         val rc = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
 
         if (rc != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         } else {
-            myCameras = cameraManager.cameraIdList.asList()
-
-            cameraServices.add(CameraService(myCameras[0], cameraManager, cameraOpenedCallback))
+            textureView.post { startCamera() }
         }
+
 
         gestureDetector = GestureDetector(this, CaptureGestureListener())
         scaleDetector = ScaleGestureDetector(this, ScaleDetectorListener())
@@ -95,56 +81,53 @@ class CameraActivity : AppCompatActivity() {
 
     }
 
-    private fun initCallbacks() {
-        cameraOpenedCallback = object : CameraService.CameraOpenedCallback {
-            override fun createCameraPreviewSession(
-                cameraDevice: CameraDevice,
-                cameraPreviewSessionCallback: CreateCameraPreviewSessionCallback
-            ) {
+    private fun startCamera() {
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            val metrics = DisplayMetrics().also { textureView.display.getRealMetrics(it) }
+            val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
+            val screenAspectRatio = Rational(metrics.widthPixels, metrics.heightPixels)
+            val previewConfig = PreviewConfig.Builder().apply {
+                setLensFacing(CameraX.LensFacing.BACK)
+                setTargetResolution(screenSize)
+                setTargetAspectRatio(screenAspectRatio)
+                setTargetRotation(textureView.display.rotation)
+            }.build()
 
-                texture.surfaceTexture.setDefaultBufferSize(1920, 1080)
-
-                val surface = Surface(texture.surfaceTexture)
-                try {
-                    val captureRequestBuilder =
-                        cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                    captureRequestBuilder.addTarget(surface)
-
-                    // cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW, captureRequestBuilder)
-
-                    cameraDevice.createCaptureSession(
-                        listOf(surface),
-                        object : CameraCaptureSession.StateCallback() {
-                            override fun onConfigureFailed(session: CameraCaptureSession) {}
-
-                            override fun onConfigured(session: CameraCaptureSession) {
-
-                                cameraPreviewSessionCallback.createCameraPreviewSession(
-                                    surface,
-                                    session,
-                                    initTextRecognizer()
-                                )
-
-                                session.setRepeatingRequest(
-                                    captureRequestBuilder.build(),
-                                    null,
-                                    null
-                                )
+            val preview = Preview(previewConfig)
 
 
-                            }
+            preview.setOnPreviewOutputUpdateListener {
 
-                        },
-                        null
-                    )
-
-
-                } catch (e: CameraAccessException) {
-                    e.printStackTrace()
-                }
+                // To update the SurfaceTexture, we have to remove it and re-add it
+                val parent = textureView.parent as ViewGroup
+                parent.removeView(textureView)
+                parent.addView(textureView, 0)
+                textureView.surfaceTexture = it.surfaceTexture
+                updateTransform()
             }
+
+
+            CameraX.bindToLifecycle(this, preview)
         }
     }
+
+
+    private fun updateTransform() {
+        val matrix = Matrix()
+        val centerX = textureView.width / 2f
+        val centerY = textureView.height / 2f
+
+        val rotationDegrees = when (textureView.display.rotation) {
+            Surface.ROTATION_0 -> 0
+            Surface.ROTATION_90 -> 90
+            Surface.ROTATION_180 -> 180
+            Surface.ROTATION_270 -> 270
+            else -> return
+        }
+        matrix.postRotate(-rotationDegrees.toFloat(), centerX, centerY)
+        textureView.setTransform(matrix)
+    }
+
 
     private fun initTextRecognizer(): TextRecognizer {
         textRecognizer = TextRecognizer.Builder(this).build()
@@ -181,59 +164,8 @@ class CameraActivity : AppCompatActivity() {
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             val autofocus = intent.getBooleanExtra(AutoFocusExtra, false)
             val useFlash = intent.getBooleanExtra(UseFlashExtra, false)
-
-            myCameras = cameraManager.cameraIdList.asList()
-
-
-            // createCameraSource(autofocus, useFlash)
         }
 
-
-    }
-
-    private fun startCameraSource() {
-
-        val code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
-            applicationContext
-        )
-
-        if (code != ConnectionResult.SUCCESS)
-            GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS).show()
-        else {
-
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (cameraServices.size > 0) {
-            cameraServices[0].openCamera(this)
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (cameraServices.size > 0) {
-            cameraServices[0].closeCamera()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (cameraServices.size > 0) {
-            cameraServices[0].closeCamera()
-            cameraServices = ArrayList()
-        }
-    }
-
-    private fun createCameraSource(autofocus: Boolean, useFlash: Boolean) {
-        val context = applicationContext
-
-
-        // TODO: Create the TextRecognizer
-        // TODO: Set the TextRecognizer's Processor
-        // TODO: Check if the TextRecognizer is operational.
-        // TODO: Create the cameraSource using the TextRecognizer
 
     }
 
@@ -284,22 +216,5 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-
-    enum class CameraType(val type: Int) {
-        CAMERA_BACK(0),
-        CAMERA_FRONT(1)
-    }
-
-
-    /**
-     * Callback через который передадим surface и cameraCaptureSession в CameraService  после их инициализации
-     */
-    interface CreateCameraPreviewSessionCallback {
-        fun createCameraPreviewSession(
-            surface: Surface,
-            cameraCaptureSession: CameraCaptureSession,
-            textRecognizer: TextRecognizer
-        )
-    }
-
 }
+
