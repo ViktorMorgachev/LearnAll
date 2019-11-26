@@ -3,19 +3,25 @@ package com.sedi.viktor.learnAll.ui.scan_words
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Matrix
+import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.DisplayMetrics
 import android.util.Rational
 import android.util.Size
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraX
-import androidx.camera.core.Preview
-import androidx.camera.core.PreviewConfig
+import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
-import com.google.android.gms.vision.text.TextRecognizer
+import com.google.firebase.FirebaseApp
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
 import com.sedi.viktor.learnAll.R
+import com.sedi.viktor.learnAll.ui.recognizers.TextRecognizer
+import kotlinx.android.synthetic.main.capture_layout.*
+import kotlinx.android.synthetic.main.preview_text_camera_layout.*
 import java.security.acl.Owner
 import java.util.concurrent.Executors
 
@@ -25,17 +31,19 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
     // Managers
     private lateinit var textRecognizer: TextRecognizer
-
+    private lateinit var detector: FirebaseVisionTextRecognizer
 
     // Views
     private lateinit var textureView: TextureView
 
-    //  private lateinit var : Detector.Processor
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleDetector: ScaleGestureDetector
     private lateinit var lifeCycleOwner: Owner
     private val executor = Executors.newSingleThreadExecutor()
 
+
+    // Callback
+    private lateinit var textRecognizedCallback: TextRecognizedCallback
 
     companion object {
         const val AutoFocusExtra = "AutoFocus"
@@ -50,6 +58,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        FirebaseApp.initializeApp(this)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(
@@ -66,11 +75,12 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             updateTransform()
         }
 
-        val rc = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+        val rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
 
         if (rc != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         } else {
+            initTextRecognizer()
             textureView.post { startCamera() }
         }
 
@@ -79,6 +89,32 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
         scaleDetector = ScaleGestureDetector(this, ScaleDetectorListener())
 
 
+    }
+
+    private fun initTextRecognizer() {
+
+
+        textRecognizedCallback = object : TextRecognizedCallback {
+            override fun onImageUnRecognized() {
+                layout_preview_text.visibility = View.GONE
+            }
+
+            override fun onImageRecognized(text: String, rect: Rect?) {
+                layout_preview_text.visibility = View.VISIBLE
+                action_text.post { action_text.text = text }
+                // После создадим вьюшку в которую будем перерисовывать с отрисовкой текста, прям на SurfaceText
+            }
+
+
+        }
+
+        detector = FirebaseVision.getInstance().onDeviceTextRecognizer
+
+        textRecognizer = TextRecognizer(
+            detector,
+            this,
+            textRecognizedCallback
+        )
     }
 
     private fun startCamera() {
@@ -103,11 +139,25 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                 parent.removeView(textureView)
                 parent.addView(textureView, 0)
                 textureView.surfaceTexture = it.surfaceTexture
+
                 updateTransform()
             }
 
+            val imageAnalysisConfig = ImageAnalysisConfig.Builder().apply {
+                setTargetResolution(Size(1280, 720))
+                val analyzerThread = HandlerThread("TextAnalizer").apply {
+                    start()
+                }
+                setCallbackHandler(Handler(analyzerThread.looper))
+                setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
+            }.build()
 
-            CameraX.bindToLifecycle(this, preview)
+
+            val imageAnalysis = ImageAnalysis(imageAnalysisConfig)
+
+            imageAnalysis.analyzer = textRecognizer
+
+            CameraX.bindToLifecycle(this, preview, imageAnalysis)
         }
     }
 
@@ -128,21 +178,6 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
         textureView.setTransform(matrix)
     }
 
-
-    private fun initTextRecognizer(): TextRecognizer {
-        textRecognizer = TextRecognizer.Builder(this).build()
-
-        if (textRecognizer.isOperational) {
-
-
-        } else {
-            // Check for low storage.  If there is low storage, the native library will not be
-            // downloaded, so detection will not become operational.
-        }
-
-        return textRecognizer
-
-    }
 
     private fun requestCameraPermission() {
         val permissions = arrayOf(Manifest.permission.CAMERA)
@@ -214,6 +249,12 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             //   cameraSource.doZoom(detector.scaleFactor)
             // }
         }
+    }
+
+
+    interface TextRecognizedCallback {
+        fun onImageRecognized(text: String, rect: Rect?)
+        fun onImageUnRecognized()
     }
 
 }

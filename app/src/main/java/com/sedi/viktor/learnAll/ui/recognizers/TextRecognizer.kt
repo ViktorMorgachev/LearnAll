@@ -2,20 +2,62 @@ package com.sedi.viktor.learnAll.ui.recognizers
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
+import com.sedi.viktor.learnAll.ui.scan_words.CameraActivity
 
 
-class TextRecognizer : ImageAnalysis.Analyzer {
+class TextRecognizer(
+    private val detector: FirebaseVisionTextRecognizer,
+    private val lifecycleOwner: LifecycleOwner,
+    private val textRecognizedCallback: CameraActivity.TextRecognizedCallback
+) :
+    ImageAnalysis.Analyzer {
+
+
+    private var lastTimeStampAnalized = System.currentTimeMillis()
+
     override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
 
-        if (imageProxy == null || imageProxy.image == null) return
+
+        if (imageProxy == null || imageProxy.image == null || (System.currentTimeMillis() - lastTimeStampAnalized < 2000)) return
 
         val image = imageProxy.image
 
         var rotation = degreesToFireBaseRotarion(rotationDegrees)
 
         var firebaseImage = FirebaseVisionImage.fromMediaImage(image!!, rotation)
+
+
+        lastTimeStampAnalized = System.currentTimeMillis()
+
+        detector.processImage(firebaseImage)
+            .addOnSuccessListener {
+
+                for (block in it.textBlocks) {
+                    for (line in block.lines) {
+                        val lineFrame = line.boundingBox
+                        val text = line.text
+
+                        when (lifecycleOwner.lifecycle.currentState) {
+                            Lifecycle.State.RESUMED -> textRecognizedCallback.onImageRecognized(
+                                text,
+                                lineFrame
+                            )
+                        }
+                    }
+                }
+
+            }
+            .addOnFailureListener {
+                when (lifecycleOwner.lifecycle.currentState) {
+                    Lifecycle.State.RESUMED -> textRecognizedCallback.onImageUnRecognized()
+                }
+            }
+
 
     }
 
