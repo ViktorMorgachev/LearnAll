@@ -1,6 +1,7 @@
 package com.sedi.viktor.learnAll.ui.scan_words
 
 import android.Manifest
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Matrix
 import android.graphics.Rect
@@ -19,10 +20,10 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
 import com.sedi.viktor.learnAll.R
+import com.sedi.viktor.learnAll.services.NetworkReceiver
 import com.sedi.viktor.learnAll.ui.recognizers.TextRecognizer
 import kotlinx.android.synthetic.main.capture_layout.*
 import kotlinx.android.synthetic.main.preview_text_camera_layout.*
-import java.security.acl.Owner
 import java.util.concurrent.Executors
 
 
@@ -30,6 +31,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
 
     // Managers
+    private lateinit var networkReceiver: NetworkReceiver
     private lateinit var textRecognizer: TextRecognizer
     private lateinit var detector: FirebaseVisionTextRecognizer
 
@@ -38,11 +40,11 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleDetector: ScaleGestureDetector
-    private lateinit var lifeCycleOwner: Owner
     private val executor = Executors.newSingleThreadExecutor()
 
 
     // Callback
+    private lateinit var netConnectivityCallback: NetConnectivityCallback
     private lateinit var textRecognizedCallback: TextRecognizedCallback
 
     companion object {
@@ -54,17 +56,26 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
     private val RC_HANDLE_GMS = 9001
     // Permission request codes need to be < 256
     private val RC_HANDLE_CAMERA_PERMISSION = 2
+    private val RC_HANDLE_INTERNET_PERMISSION = 3;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         FirebaseApp.initializeApp(this)
 
+
+        initCallbacks()
+
+        // Регистрируем сервис следящий за интернетом
+        registerConnectivityReceiver()
+
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
+
+
 
         setContentView(R.layout.capture_layout)
 
@@ -75,9 +86,16 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             updateTransform()
         }
 
-        val rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        val requestInternet = ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
 
-        if (rc != PackageManager.PERMISSION_GRANTED) {
+        if (requestInternet != PackageManager.PERMISSION_GRANTED) {
+            requestInternetPermission()
+        }
+
+
+        val requestCamera = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+
+        if (requestCamera != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         } else {
             initTextRecognizer()
@@ -89,6 +107,27 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
         scaleDetector = ScaleGestureDetector(this, ScaleDetectorListener())
 
 
+    }
+
+    private fun initCallbacks() {
+        netConnectivityCallback = object : NetConnectivityCallback {
+            override fun onSuccessNetConnected() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onFaillureNetConnected() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+        }
+    }
+
+    private fun registerConnectivityReceiver() {
+        networkReceiver = NetworkReceiver(netConnectivityCallback, this)
+        val intentFilter = IntentFilter().apply {
+            addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        }
+        registerReceiver(networkReceiver, intentFilter)
     }
 
     private fun initTextRecognizer() {
@@ -104,8 +143,6 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                 action_text.post { action_text.text = text }
                 // После создадим вьюшку в которую будем перерисовывать с отрисовкой текста, прям на SurfaceText
             }
-
-
         }
 
         detector = FirebaseVision.getInstance().onDeviceTextRecognizer
@@ -187,18 +224,31 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
         }
     }
 
+
+    private fun requestInternetPermission() {
+        val permissions = arrayOf(Manifest.permission.INTERNET)
+
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
+            ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_INTERNET_PERMISSION)
+        }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
 
-        if (requestCode != RC_HANDLE_CAMERA_PERMISSION)
+        if (requestCode != RC_HANDLE_CAMERA_PERMISSION && requestCode != RC_HANDLE_INTERNET_PERMISSION)
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            val autofocus = intent.getBooleanExtra(AutoFocusExtra, false)
-            val useFlash = intent.getBooleanExtra(UseFlashExtra, false)
+        if (requestCode == RC_HANDLE_INTERNET_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                val autofocus = intent.getBooleanExtra(AutoFocusExtra, false)
+                val useFlash = intent.getBooleanExtra(UseFlashExtra, false)
+            }
+        } else {
+
         }
 
 
@@ -249,6 +299,11 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             //   cameraSource.doZoom(detector.scaleFactor)
             // }
         }
+    }
+
+    interface NetConnectivityCallback {
+        fun onSuccessNetConnected()
+        fun onFaillureNetConnected()
     }
 
 
