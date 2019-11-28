@@ -1,5 +1,6 @@
 package com.sedi.viktor.learnAll.ui.recognizers
 
+import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.Lifecycle
@@ -13,15 +14,38 @@ import com.sedi.viktor.learnAll.ui.scan_words.CameraActivity
 class TextRecognizer(
     private val detector: FirebaseVisionTextRecognizer,
     private val lifecycleOwner: LifecycleOwner,
-    private val textRecognizedCallback: CameraActivity.TextRecognizedCallback
+    private val textRecognizedCallback: CameraActivity.TextRecognizedCallback,
+    private var availableNetwork: Boolean
 ) :
     ImageAnalysis.Analyzer {
 
-
     private var lastTimeStampAnalized = System.currentTimeMillis()
+
 
     override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
 
+        if (!availableNetwork) {
+            analizeDevice(imageProxy, rotationDegrees)
+        } else {
+            analizeCloud(imageProxy, rotationDegrees)
+        }
+
+    }
+
+    private fun analizeCloud(imageProxy: ImageProxy?, rotationDegrees: Int) {
+
+
+        // TODO Тут будем анализировать через облако
+
+        Log.d("LearnAll", "Web analise")
+
+    }
+
+
+    fun analizeDevice(imageProxy: ImageProxy?, rotationDegrees: Int) {
+
+
+        Log.d("LearnAll", "Device analise")
 
         if (imageProxy == null || imageProxy.image == null || (System.currentTimeMillis() - lastTimeStampAnalized < 2000)) return
 
@@ -57,8 +81,6 @@ class TextRecognizer(
                     Lifecycle.State.RESUMED -> textRecognizedCallback.onImageUnRecognized()
                 }
             }
-
-
     }
 
     fun degreesToFireBaseRotarion(degrees: Int): Int {
@@ -71,5 +93,9 @@ class TextRecognizer(
                 "Rotation must be 0, 90, 180, or 270."
             )
         }
+    }
+
+    fun isAvailableNetwork(availableNetwork: Boolean) {
+        this.availableNetwork = availableNetwork
     }
 }

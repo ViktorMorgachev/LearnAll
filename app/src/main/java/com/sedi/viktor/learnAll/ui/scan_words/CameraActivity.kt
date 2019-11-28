@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.Rational
 import android.util.Size
 import android.view.*
@@ -32,14 +33,15 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
     // Managers
     private lateinit var networkReceiver: NetworkReceiver
-    private lateinit var textRecognizer: TextRecognizer
-    private lateinit var detector: FirebaseVisionTextRecognizer
+    private var textRecognizer: TextRecognizer? = null
+    private var detector: FirebaseVisionTextRecognizer? = null
 
     // Views
     private lateinit var textureView: TextureView
 
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleDetector: ScaleGestureDetector
+    private var availableNetwork = false
     private val executor = Executors.newSingleThreadExecutor()
 
 
@@ -112,14 +114,27 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
     private fun initCallbacks() {
         netConnectivityCallback = object : NetConnectivityCallback {
             override fun onSuccessNetConnected() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                availableNetwork = true
+                swichDataRecognize(true)
             }
 
             override fun onFaillureNetConnected() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                availableNetwork = true
+                swichDataRecognize(false)
             }
 
         }
+    }
+
+    private fun swichDataRecognize(isNetworkAvailable: Boolean) {
+
+
+        Log.d("LearnAll", "Available Network: $isNetworkAvailable")
+
+        if (textRecognizer != null) {
+            textRecognizer!!.isAvailableNetwork(availableNetwork)
+        }
+
     }
 
     private fun registerConnectivityReceiver() {
@@ -145,12 +160,15 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             }
         }
 
-        detector = FirebaseVision.getInstance().onDeviceTextRecognizer
+        detector = if (!availableNetwork)
+            FirebaseVision.getInstance().onDeviceTextRecognizer
+        else FirebaseVision.getInstance().cloudTextRecognizer
 
         textRecognizer = TextRecognizer(
-            detector,
+            detector!!,
             this,
-            textRecognizedCallback
+            textRecognizedCallback,
+            availableNetwork
         )
     }
 
