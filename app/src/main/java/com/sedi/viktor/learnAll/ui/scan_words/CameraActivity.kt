@@ -42,6 +42,8 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleDetector: ScaleGestureDetector
     private var availableNetwork = false
+    private var handler = Handler()
+    private lateinit var runnable: Runnable
     private val executor = Executors.newSingleThreadExecutor()
 
 
@@ -66,18 +68,19 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
         FirebaseApp.initializeApp(this)
 
 
+        runnable = Runnable {
+            Log.d("LearnAll", "Was Background thread")
+        }
+
         initCallbacks()
 
-        // Регистрируем сервис следящий за интернетом
-        registerConnectivityReceiver()
+
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
-
-
 
         setContentView(R.layout.capture_layout)
 
@@ -104,11 +107,27 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             textureView.post { startCamera() }
         }
 
-
         gestureDetector = GestureDetector(this, CaptureGestureListener())
         scaleDetector = ScaleGestureDetector(this, ScaleDetectorListener())
 
 
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        // Регистрируем сервис следящий за интернетом
+        registerConnectivityReceiver()
+        handler.removeCallbacks(runnable)
+        handler.postDelayed(runnable, 4000)
+
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(runnable)
+        unregisterReceiver(networkReceiver)
     }
 
     private fun initCallbacks() {
@@ -122,7 +141,6 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                 availableNetwork = true
                 swichDataRecognize(false)
             }
-
         }
     }
 
@@ -198,14 +216,16 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                 updateTransform()
             }
 
-            val imageAnalysisConfig = ImageAnalysisConfig.Builder().apply {
-                setTargetResolution(Size(1280, 720))
-                val analyzerThread = HandlerThread("TextAnalizer").apply {
-                    start()
-                }
-                setCallbackHandler(Handler(analyzerThread.looper))
-                setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-            }.build()
+            val analyzerThread = HandlerThread("TextAnalizer").apply {
+                start()
+            }
+
+            val imageAnalysisConfig = ImageAnalysisConfig.Builder()
+                .setTargetResolution(Size(1280, 720))
+                .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_NEXT_IMAGE)
+                .setCallbackHandler(
+                    Handler(analyzerThread.looper)
+                ).build()
 
 
             val imageAnalysis = ImageAnalysis(imageAnalysisConfig)
@@ -301,6 +321,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             return onTap(e.rawX, e.rawY) || super.onSingleTapConfirmed(e)
         }
     }
+
 
     private inner class ScaleDetectorListener : ScaleGestureDetector.OnScaleGestureListener {
 
