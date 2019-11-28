@@ -44,6 +44,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
     private var availableNetwork = false
     private var handler = Handler()
     private lateinit var runnable: Runnable
+    private lateinit var preview: Preview
     private val executor = Executors.newSingleThreadExecutor()
 
 
@@ -149,9 +150,16 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
         Log.d("LearnAll", "Available Network: $isNetworkAvailable")
 
+        detector = if (!availableNetwork)
+            FirebaseVision.getInstance().onDeviceTextRecognizer
+        else FirebaseVision.getInstance().cloudTextRecognizer
+
+
         if (textRecognizer != null) {
-            textRecognizer!!.isAvailableNetwork(availableNetwork)
+            textRecognizer!!.setAvailableNetwork(isNetworkAvailable)
+            textRecognizer!!.swithDetector(detector!!)
         }
+
 
     }
 
@@ -164,7 +172,6 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
     }
 
     private fun initTextRecognizer() {
-
 
         textRecognizedCallback = object : TextRecognizedCallback {
             override fun onImageUnRecognized() {
@@ -192,6 +199,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
     private fun startCamera() {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+
             val metrics = DisplayMetrics().also { textureView.display.getRealMetrics(it) }
             val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
             val screenAspectRatio = Rational(metrics.widthPixels, metrics.heightPixels)
@@ -202,7 +210,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                 setTargetRotation(textureView.display.rotation)
             }.build()
 
-            val preview = Preview(previewConfig)
+            preview = Preview(previewConfig)
 
 
             preview.setOnPreviewOutputUpdateListener {
@@ -227,6 +235,32 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                     Handler(analyzerThread.looper)
                 ).build()
 
+
+            val imageAnalysis = ImageAnalysis(imageAnalysisConfig)
+
+            imageAnalysis.analyzer = textRecognizer
+
+
+            CameraX.bindToLifecycle(this, preview, imageAnalysis)
+        }
+    }
+
+
+    private fun restartCamera() {
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+
+            CameraX.unbindAll()
+
+            val analyzerThread = HandlerThread("TextAnalizer").apply {
+                start()
+            }
+
+            val imageAnalysisConfig = ImageAnalysisConfig.Builder()
+                .setTargetResolution(Size(1280, 720))
+                .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_NEXT_IMAGE)
+                .setCallbackHandler(
+                    Handler(analyzerThread.looper)
+                ).build()
 
             val imageAnalysis = ImageAnalysis(imageAnalysisConfig)
 

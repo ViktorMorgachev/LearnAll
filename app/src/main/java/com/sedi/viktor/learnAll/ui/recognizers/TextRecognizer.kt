@@ -12,7 +12,7 @@ import com.sedi.viktor.learnAll.ui.scan_words.CameraActivity
 
 
 class TextRecognizer(
-    private val detector: FirebaseVisionTextRecognizer,
+    private var detector: FirebaseVisionTextRecognizer,
     private val lifecycleOwner: LifecycleOwner,
     private val textRecognizedCallback: CameraActivity.TextRecognizedCallback,
     private var availableNetwork: Boolean
@@ -42,7 +42,7 @@ class TextRecognizer(
     }
 
 
-    fun analizeDevice(imageProxy: ImageProxy?, rotationDegrees: Int) {
+    private fun analizeDevice(imageProxy: ImageProxy?, rotationDegrees: Int) {
 
 
         Log.d("LearnAll", "Device analise")
@@ -83,7 +83,7 @@ class TextRecognizer(
             }
     }
 
-    fun degreesToFireBaseRotarion(degrees: Int): Int {
+    private fun degreesToFireBaseRotarion(degrees: Int): Int {
         return when (degrees) {
             0 -> FirebaseVisionImageMetadata.ROTATION_0
             90 -> FirebaseVisionImageMetadata.ROTATION_90
@@ -95,7 +95,13 @@ class TextRecognizer(
         }
     }
 
-    fun isAvailableNetwork(availableNetwork: Boolean) {
-        this.availableNetwork = availableNetwork
+
+    fun swithDetector(newDetector: FirebaseVisionTextRecognizer) {
+        detector = newDetector
     }
+
+    fun setAvailableNetwork(isNetworkAvailable: Boolean) {
+        availableNetwork = isNetworkAvailable
+    }
+
 }
