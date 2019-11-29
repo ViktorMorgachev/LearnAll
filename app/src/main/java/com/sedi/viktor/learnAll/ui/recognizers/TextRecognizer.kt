@@ -13,6 +13,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptions
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
 import com.sedi.viktor.learnAll.ui.scan_words.CameraActivity
+import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
 
@@ -29,6 +30,9 @@ class TextRecognizer(
 
     private var lastTimeStampAnalized = 0L
 
+    // Improve perfomance
+    private var latestImage: ByteBuffer? = null
+
 
     override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
 
@@ -36,7 +40,7 @@ class TextRecognizer(
 
 
         val currenTimeStamp = System.currentTimeMillis()
-        if (currenTimeStamp - lastTimeStampAnalized >= TimeUnit.SECONDS.toMillis(1)) {
+        if (currenTimeStamp - lastTimeStampAnalized >= TimeUnit.SECONDS.toMillis(2000)) {
             lastTimeStampAnalized = currenTimeStamp
         } else return
 
@@ -44,7 +48,8 @@ class TextRecognizer(
         if (!availableNetwork) {
             analizeDevice(imageProxy.image!!, rotationDegrees)
         } else {
-            analizeCloud(imageProxy.image!!, rotationDegrees)
+            analizeDevice(imageProxy.image!!, rotationDegrees)
+            // analizeCloud(imageProxy.image!!, rotationDegrees)
         }
 
     }
