@@ -28,7 +28,7 @@ class TextRecognizer(
     private val handler = Handler()
     private var firebaseImage: FirebaseVisionImage? = null
 
-    private var lastTimeStampAnalized = 0L
+    private var lastTimeStampAnalized = System.currentTimeMillis()
 
     // Improve perfomance
     private var latestImage: ByteBuffer? = null
@@ -40,9 +40,9 @@ class TextRecognizer(
 
 
         val currenTimeStamp = System.currentTimeMillis()
-        if (currenTimeStamp - lastTimeStampAnalized >= TimeUnit.SECONDS.toMillis(2000)) {
-            lastTimeStampAnalized = currenTimeStamp
-        } else return
+        if (currenTimeStamp - lastTimeStampAnalized < TimeUnit.SECONDS.toMillis(1)) return
+
+        lastTimeStampAnalized = currenTimeStamp
 
 
         if (!availableNetwork) {
@@ -145,7 +145,7 @@ class TextRecognizer(
         availableNetwork = isNetworkAvailable
 
         when (isNetworkAvailable) {
-            true -> detector = FirebaseVision.getInstance().cloudTextRecognizer
+            true -> detector = FirebaseVision.getInstance().onDeviceTextRecognizer
             else -> detector = FirebaseVision.getInstance().onDeviceTextRecognizer
         }
 
