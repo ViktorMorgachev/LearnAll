@@ -1,14 +1,19 @@
 package com.sedi.viktor.learnAll.ui.recognizers
 
+import android.media.Image
+import android.os.Handler
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
+import com.google.firebase.ml.vision.text.FirebaseVisionCloudTextRecognizerOptions
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
 import com.sedi.viktor.learnAll.ui.scan_words.CameraActivity
+import java.util.concurrent.TimeUnit
 
 
 class TextRecognizer(
@@ -19,46 +24,81 @@ class TextRecognizer(
 ) :
     ImageAnalysis.Analyzer {
 
-    private var lastTimeStampAnalized = System.currentTimeMillis()
+    private val handler = Handler()
+    private var firebaseImage: FirebaseVisionImage? = null
+
+    private var lastTimeStampAnalized = 0L
 
 
     override fun analyze(imageProxy: ImageProxy?, rotationDegrees: Int) {
 
+        if (imageProxy == null || imageProxy.image == null) return
+
+
+        val currenTimeStamp = System.currentTimeMillis()
+        if (currenTimeStamp - lastTimeStampAnalized >= TimeUnit.SECONDS.toMillis(1)) {
+            lastTimeStampAnalized = currenTimeStamp
+        } else return
+
+
         if (!availableNetwork) {
-            analizeDevice(imageProxy, rotationDegrees)
+            analizeDevice(imageProxy.image!!, rotationDegrees)
         } else {
-            analizeCloud(imageProxy, rotationDegrees)
+            analizeCloud(imageProxy.image!!, rotationDegrees)
         }
 
     }
 
-    private fun analizeCloud(imageProxy: ImageProxy?, rotationDegrees: Int) {
-
+    private fun analizeCloud(image: Image, rotationDegrees: Int) {
 
         // TODO Тут будем анализировать через облако
+        val options = FirebaseVisionCloudTextRecognizerOptions.Builder()
+            .setLanguageHints(listOf("ru", "en", "cz")).build()
+
+
+        var rotation = degreesToFireBaseRotarion(rotationDegrees)
+
+        firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation)
+
+        detector.processImage(firebaseImage!!)
+            .addOnSuccessListener {
+                for (block in it.textBlocks) {
+                    for (line in block.lines) {
+                        val lineFrame = line.boundingBox
+                        val text = line.text
+
+                        when (lifecycleOwner.lifecycle.currentState) {
+                            Lifecycle.State.RESUMED -> textRecognizedCallback.onImageRecognized(
+                                text,
+                                lineFrame
+                            )
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener {
+                when (lifecycleOwner.lifecycle.currentState) {
+                    Lifecycle.State.RESUMED -> textRecognizedCallback.onImageUnRecognized()
+                }
+            }
+
 
         Log.d("LearnAll", "Web analise")
 
     }
 
 
-    private fun analizeDevice(imageProxy: ImageProxy?, rotationDegrees: Int) {
+    private fun analizeDevice(image: Image, rotationDegrees: Int) {
 
 
         Log.d("LearnAll", "Device analise")
 
-        if (imageProxy == null || imageProxy.image == null || (System.currentTimeMillis() - lastTimeStampAnalized < 2000)) return
-
-        val image = imageProxy.image
 
         var rotation = degreesToFireBaseRotarion(rotationDegrees)
 
-        var firebaseImage = FirebaseVisionImage.fromMediaImage(image!!, rotation)
+        firebaseImage = FirebaseVisionImage.fromMediaImage(image, rotation)
 
-
-        lastTimeStampAnalized = System.currentTimeMillis()
-
-        detector.processImage(firebaseImage)
+        detector.processImage(firebaseImage!!)
             .addOnSuccessListener {
 
                 for (block in it.textBlocks) {
@@ -96,12 +136,15 @@ class TextRecognizer(
     }
 
 
-    fun swithDetector(newDetector: FirebaseVisionTextRecognizer) {
-        detector = newDetector
-    }
-
     fun setAvailableNetwork(isNetworkAvailable: Boolean) {
         availableNetwork = isNetworkAvailable
+
+        when (isNetworkAvailable) {
+            true -> detector = FirebaseVision.getInstance().cloudTextRecognizer
+            else -> detector = FirebaseVision.getInstance().onDeviceTextRecognizer
+        }
+
     }
+
 
 }

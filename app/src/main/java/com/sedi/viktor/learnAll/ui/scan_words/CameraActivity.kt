@@ -13,6 +13,7 @@ import android.util.Log
 import android.util.Rational
 import android.util.Size
 import android.view.*
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
@@ -150,14 +151,9 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
         Log.d("LearnAll", "Available Network: $isNetworkAvailable")
 
-        detector = if (!availableNetwork)
-            FirebaseVision.getInstance().onDeviceTextRecognizer
-        else FirebaseVision.getInstance().cloudTextRecognizer
-
 
         if (textRecognizer != null) {
             textRecognizer!!.setAvailableNetwork(isNetworkAvailable)
-            textRecognizer!!.swithDetector(detector!!)
         }
 
 
@@ -174,10 +170,12 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
     private fun initTextRecognizer() {
 
         textRecognizedCallback = object : TextRecognizedCallback {
+            @UiThread
             override fun onImageUnRecognized() {
                 layout_preview_text.visibility = View.GONE
             }
 
+            @UiThread
             override fun onImageRecognized(text: String, rect: Rect?) {
                 layout_preview_text.visibility = View.VISIBLE
                 action_text.post { action_text.text = text }
@@ -304,6 +302,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_INTERNET_PERMISSION)
         }
     }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
