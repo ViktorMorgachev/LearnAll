@@ -227,7 +227,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
             }
 
             val imageAnalysisConfig = ImageAnalysisConfig.Builder()
-                .setTargetResolution(Size(1280, 720))
+                .setTargetResolution(Size(680, 440))
                 .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_NEXT_IMAGE)
                 .setCallbackHandler(
                     Handler(analyzerThread.looper)
