@@ -19,21 +19,26 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     override fun onSuccess(response: String) {
 
         when (direction) {
-            Direction.TO_NATIVE -> initOthers(response)
-            Direction.TO_OTHER -> initNative(response)
+            Direction.TO_OTHER -> initOthers(response)
+            Direction.TO_NATIVE -> initNative(response)
         }
 
     }
 
+
     private fun initNative(response: String) {
 
-        et_word_native.setText(response)
-        et_card_native.setText(response)
+
+        et_word_native.post { et_word_native.setText(response) }
+        et_card_native.post { et_card_native.setText(response) }
 
     }
 
+
     private fun initOthers(response: String) {
 
+        et_word_other.post { et_word_other.setText(response) }
+        et_card_other.post { et_card_other.setText(response) }
 
     }
 
@@ -43,6 +48,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     }
 
     companion object {
+        var notListen: Boolean = false
         lateinit var direction: Direction
     }
 
@@ -65,17 +71,12 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     private fun initViewListeners() {
         et_word_native.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                direction = Direction.TO_OTHER
 
                 et_card_native.setText(s.toString())
+
+                if (notListen) return
+
+                direction = Direction.TO_OTHER
 
                 yandexTranslater.translate(
                     "ru",
@@ -84,22 +85,29 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
                     this@EditWordActivity,
                     this@EditWordActivity
                 )
+
+                notListen = true
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+
             }
         })
 
         et_word_other.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                direction = Direction.TO_NATIVE
 
                 et_card_other.setText(s.toString())
+
+                if (notListen) return
+
+                direction = Direction.TO_NATIVE
 
                 yandexTranslater.translate(
                     "cs",
@@ -108,6 +116,17 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
                     this@EditWordActivity,
                     this@EditWordActivity
                 )
+
+                notListen = true
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+
             }
         })
     }
