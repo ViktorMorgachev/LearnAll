@@ -8,18 +8,19 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_pictire_card"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
                 android:paddingStart="50dp"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp"
@@ -60,28 +61,27 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_native_card"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="50dp"
+                android:paddingLeft="40dp"
                 android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                app:layout_constraintLeft_toRightOf="@id/cl_other_card"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
+                android:paddingRight="40dp"
+                android:paddingBottom="20dp">
 
                 <ImageView
                     android:id="@+id/iv_word_native"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:background="@color/cardview_dark_background"
                     app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/iv_word_native_edit"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
                     app:layout_constraintBottom_toBottomOf="@id/iv_word_native"
@@ -94,18 +94,20 @@
                     android:id="@+id/iv_word_native_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_delete"
+                    android:src="@drawable/ic_delete_24dp"
                     app:layout_constraintLeft_toRightOf="@+id/iv_word_native"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
                 <ImageView
                     android:id="@+id/iv_word_native_edit"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:src="@drawable/ic_edit_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_word_native"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_word_native" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/iv_word_native"
+                    app:layout_constraintRight_toRightOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -114,22 +116,25 @@
                 android:id="@+id/cl_other_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="50dp"
+                android:paddingLeft="40dp"
                 android:paddingTop="20dp"
+                android:paddingRight="40dp"
                 android:paddingBottom="20dp">
 
                 <ImageView
                     android:id="@+id/iv_word_other"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
                     android:layout_height="150dp"
                     android:background="@color/cardview_dark_background"
                     app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/iv_word_other_edit"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
                     app:layout_constraintBottom_toBottomOf="@id/iv_word_other"
@@ -142,18 +147,20 @@
                     android:id="@+id/iv_word_other_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_delete"
+                    android:src="@drawable/ic_delete_24dp"
                     app:layout_constraintLeft_toRightOf="@+id/iv_word_other"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
                 <ImageView
                     android:id="@+id/iv_word_other_edit"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:src="@drawable/ic_edit_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_word_other"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_word_other" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/iv_word_other"
+                    app:layout_constraintRight_toRightOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -161,24 +168,31 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="50dp"
+                android:paddingLeft="40dp"
                 android:paddingTop="20dp"
+                android:paddingRight="40dp"
                 android:paddingBottom="20dp">
+
 
                 <EditText
                     android:id="@+id/et_word_other"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:textAlignment="center"
+                    android:hint="@string/input_text_other"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/iv_mic_other"
+                    app:layout_constraintRight_toLeftOf="@id/iv_edit_other"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Doktorka" />
 
+
                 <ImageView
-                    android:id="@+id/iv_mic_other"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:id="@+id/iv_edit_other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:hint="@string/input_text_native"
                     android:src="@drawable/ic_mic_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/et_word_other"
@@ -191,29 +205,35 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="50dp"
+                android:paddingLeft="40dp"
                 android:paddingTop="20dp"
+                android:paddingRight="40dp"
                 android:paddingBottom="20dp">
+
 
                 <EditText
                     android:id="@+id/et_word_native"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/iv_mic_native"
+                    app:layout_constraintRight_toLeftOf="@id/iv_edit_native"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Доктор" />
 
+
                 <ImageView
-                    android:id="@+id/iv_mic_native"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:id="@+id/iv_edit_native"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
                     android:src="@drawable/ic_mic_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/et_word_native"
                     app:layout_constraintLeft_toRightOf="@id/et_word_native"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="@id/et_word_native"
+                    tools:text="Доктор" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -221,9 +241,9 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="50dp"
+                android:paddingLeft="40dp"
                 android:paddingTop="20dp"
-                android:paddingRight="20dp"
+                android:paddingRight="40dp"
                 android:paddingBottom="20dp">
 
 
@@ -243,6 +263,7 @@
                     android:layout_height="wrap_content"
                     android:layerType="hardware"
                     android:orientation="horizontal"
+                    android:progress="2"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/iv_play_stop_voice"
                     app:layout_constraintRight_toLeftOf="@id/iv_edit_voice"
@@ -265,7 +286,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:onClick="SaveWord"
                 android:paddingTop="10dp"
+                android:text="@android:string/ok"
                 tools:text="ОК" />
 
         </LinearLayout>
