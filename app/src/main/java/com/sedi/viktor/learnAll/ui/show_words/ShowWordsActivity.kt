@@ -7,7 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.databinding.WordsActivityBinding
-import com.sedi.viktor.learnAll.models.WordItem
+import com.sedi.viktor.learnAll.data.models.WordItem
 import kotlinx.android.synthetic.main.words_activity.*
 
 class ShowWordsActivity : AppCompatActivity() {

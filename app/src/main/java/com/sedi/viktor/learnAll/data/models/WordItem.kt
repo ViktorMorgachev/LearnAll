@@ -1,4 +1,4 @@
-package com.sedi.viktor.learnAll.models
+package com.sedi.viktor.learnAll.data.models
 
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
@@ -8,7 +8,7 @@ import com.sedi.viktor.learnAll.BR
 class WordItem : BaseObservable {
 
     @get:Bindable
-    var otherName: String
+    var otherName: String = ""
         set(value) {
             field = value
             notifyPropertyChanged(BR.otherName)

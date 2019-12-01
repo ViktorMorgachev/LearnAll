@@ -60,7 +60,7 @@
     <data>
         <variable
             name="Word"
-            type="com.sedi.viktor.learnAll.models.WordItem" />
+            type="com.sedi.viktor.learnAll.data.models.WordItem" />
     </data>
 
 </layout>

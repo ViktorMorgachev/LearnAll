@@ -79,6 +79,7 @@
 
 
                 <TextView
+                    android:id="@+id/et_card_native"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
@@ -132,6 +133,7 @@
 
 
                 <TextView
+                    android:id="@+id/et_card_other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
@@ -178,9 +180,9 @@
                     android:id="@+id/et_word_other"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:hint="@string/input_text_other"
                     android:orientation="horizontal"
                     android:textAlignment="center"
-                    android:hint="@string/input_text_other"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@id/iv_edit_other"

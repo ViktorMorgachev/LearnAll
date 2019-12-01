@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.sedi.viktor.learnAll.databinding.ItemWordBinding
-import com.sedi.viktor.learnAll.models.WordItem
+import com.sedi.viktor.learnAll.data.models.WordItem
 
 class WordsRepositoryAdapter(private val items: List<WordItem>) :
     RecyclerView.Adapter<WordsRepositoryAdapter.WordsHolder>() {
