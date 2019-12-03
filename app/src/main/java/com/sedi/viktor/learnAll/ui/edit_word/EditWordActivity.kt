@@ -1,12 +1,20 @@
 package com.sedi.viktor.learnAll.ui.edit_word
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
@@ -66,8 +74,9 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     }
 
     companion object {
-        var notListen: Boolean = false
         var direction = Direction.DEFAULT
+        const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
+        const val REQ_CODE_SPEECH_INPUT = 5;
     }
 
 
@@ -165,6 +174,101 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         TO_OTHER,
         TO_NATIVE,
         DEFAULT
+    }
+
+    fun onVoiceInputNative(view: View) {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            Toast.makeText(
+                this,
+                R.string.no_recognition_available,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        direction = Direction.TO_NATIVE
+        checkVoicePermissions()
+
+    }
+
+
+    private fun checkVoicePermissions() {
+        val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
+
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
+            ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_RECORD_AUDIO_PERMISSION)
+        }
+    }
+
+
+    fun onVoiceInputOther(view: View) {
+
+
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            Toast.makeText(
+                this,
+                R.string.no_recognition_available,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        direction = Direction.TO_OTHER
+        checkVoicePermissions()
+
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+
+        if (requestCode != RC_HANDLE_RECORD_AUDIO_PERMISSION)
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == RC_HANDLE_RECORD_AUDIO_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Maybe Start Speech recognithion
+                startSpeechInput()
+            }
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQ_CODE_SPEECH_INPUT && resultCode == Activity.RESULT_OK) {
+
+            when (direction) {
+
+
+                Direction.TO_NATIVE -> {
+                    et_card_native.text =
+                        data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!![0]
+                }
+                Direction.TO_OTHER -> {
+                    et_card_other.text =
+                        data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!![0]
+                }
+                else -> return
+            }
+        }
+    }
+
+    private fun startSpeechInput() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+        )
+
+
+        when (direction) {
+            Direction.TO_NATIVE -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ru")
+            Direction.TO_OTHER -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "cs")
+        }
+
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Скажи что хотел")
+        startActivityForResult(intent, REQ_CODE_SPEECH_INPUT)
     }
 
 }
