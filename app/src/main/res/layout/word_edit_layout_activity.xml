@@ -176,16 +176,30 @@
                 android:paddingBottom="20dp">
 
 
+                <ImageView
+                    android:id="@+id/iv_translate_other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_translate"
+                    android:onClick="OnTranslateOther"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/et_word_other"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
                 <EditText
                     android:id="@+id/et_word_other"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:hint="@string/input_text_other"
                     android:maxLines="1"
                     android:orientation="horizontal"
                     android:textAlignment="center"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/iv_translate_other"
                     app:layout_constraintRight_toLeftOf="@id/iv_edit_other"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Doktorka" />
@@ -213,16 +227,29 @@
                 android:paddingBottom="20dp">
 
 
+                <ImageView
+                    android:id="@+id/iv_translate_native"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="OnTranslateNative"
+                    android:src="@drawable/ic_translate"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/et_word_native"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <EditText
                     android:id="@+id/et_word_native"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:hint="@string/input_text_native"
                     android:maxLines="1"
                     android:orientation="horizontal"
                     android:textAlignment="center"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/iv_translate_native"
                     app:layout_constraintRight_toLeftOf="@id/iv_edit_native"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Доктор" />
@@ -248,7 +275,8 @@
                 android:paddingLeft="40dp"
                 android:paddingTop="20dp"
                 android:paddingRight="40dp"
-                android:paddingBottom="20dp">
+                android:paddingBottom="20dp"
+                android:visibility="gone">
 
 
                 <ImageView
@@ -278,6 +306,8 @@
                     android:id="@+id/iv_edit_voice"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:src="@drawable/ic_edit_black_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/pb_voice"

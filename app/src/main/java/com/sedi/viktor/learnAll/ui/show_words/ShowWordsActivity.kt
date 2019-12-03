@@ -2,6 +2,7 @@ package com.sedi.viktor.learnAll.ui.show_words
 
 import android.os.Bundle
 import android.os.Handler
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,5 +32,7 @@ class ShowWordsActivity : AppCompatActivity() {
 
 
     }
+
+
 
 }

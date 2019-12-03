@@ -12,6 +12,6 @@
     <string name="ocr_success">Text read successfully</string>
     <string name="ocr_failure">No text captured</string>
     <string name="ocr_error">"Error reading text: %1$s"</string>
-    <string name="input_text_other">Пожалуйста введите текст на иностраном языке</string>
-    <string name="input_text_native">Введите на родном языке</string>
+    <string name="input_text_other">Иностранный язык</string>
+    <string name="input_text_native">Родной язык</string>
 </resources>
