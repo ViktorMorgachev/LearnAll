@@ -2,6 +2,7 @@ package com.sedi.viktor.learnAll.ui.edit_word
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -22,28 +23,43 @@ import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
+import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
+import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeStyleListener
 import kotlinx.android.synthetic.main.word_edit_layout_activity.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.format.TextStyle
 
 
-class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseCallbackImpl {
+class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseCallbackImpl,
+    ChangeColorListener, ChangeStyleListener {
 
 
     companion object {
-        lateinit var firstCardState: CardState
-        lateinit var secondCardState: CardState
-        var modifyingItem = ModifyingCard.NONE
-        var direction = Direction.DEFAULT
         const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
         const val REQ_CODE_SPEECH_INPUT = 5
     }
 
 
+    lateinit var firstCardState: CardState
+    lateinit var secondCardState: CardState
+    var modifyingCard = ModifyingCard.NONE
+    var modifyingItem = ModifyingItem.NONE
+    var direction = Direction.DEFAULT
+    lateinit var alertDialog: AlertDialog
     var wordItem = WordItem("", "")
     lateinit var yandexTranslater: YandexTranslater
 
+
+    // Ovveride and callbacks
+    override fun onChanged(color: Color) {
+
+
+    }
+
+    override fun onChanged(textStyle: TextStyle) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun onSuccess(response: String) {
 
@@ -71,6 +87,15 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
     }
 
+    override fun onFaillure(e: Exception) {
+
+        iv_edit_native.isEnabled = true
+        iv_edit_other.isEnabled = true
+
+        if (e.message != null)
+            Log.e("LearnAll", e.message!!)
+    }
+
 
     private fun initNative(response: String) {
 
@@ -87,15 +112,6 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         et_word_other.post { et_word_other.setText(response) }
         et_card_other.post { et_card_other.setText(response) }
 
-    }
-
-    override fun onFaillure(e: Exception) {
-
-        iv_edit_native.isEnabled = true
-        iv_edit_other.isEnabled = true
-
-        if (e.message != null)
-            Log.e("LearnAll", e.message!!)
     }
 
 
@@ -319,25 +335,31 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
     private fun showEditFontdialog(): Boolean {
 
+        alertDialog = AlertDialog.Builder(this).create()
 
         return false
     }
 
     private fun showChangeColorDialog(modifyingItem: ModifyingItem): Boolean {
+
+        this.modifyingItem = modifyingItem
+
+        alertDialog = AlertDialog.Builder(this).create()
+
         return false
     }
 
 
     fun OnEditCardOther(view: View) {
 
-        modifyingItem = ModifyingCard.OTHER_CARD
+        modifyingCard = ModifyingCard.OTHER_CARD
         showPopupMenu(view)
     }
 
     fun OnEditCardNative(view: View) {
 
 
-        modifyingItem = ModifyingCard.NATIVE_CARD
+        modifyingCard = ModifyingCard.NATIVE_CARD
         showPopupMenu(view)
 
     }
@@ -360,6 +382,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     enum class ModifyingItem {
         CARD,
         TEXT,
+        NONE
     }
 
 
