@@ -15,4 +15,7 @@
     <string name="input_text_other">Иностранный язык</string>
     <string name="input_text_native">Родной язык</string>
     <string name="no_recognition_available">Голосовой ввод недоступен</string>
+    <string name="text_color">Цвет текста</string>
+    <string name="card_color">Цвет фона</string>
+    <string name="text_font">Стиль</string>
 </resources>

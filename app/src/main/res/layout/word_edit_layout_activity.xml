@@ -89,22 +89,16 @@
                     app:layout_constraintLeft_toLeftOf="@id/iv_word_native"
                     app:layout_constraintRight_toRightOf="@id/iv_word_native"
                     app:layout_constraintTop_toTopOf="@id/iv_word_native"
-                    tools:text="Doktorka" />
+                    tools:text="Доктор" />
 
-                <ImageView
-                    android:id="@+id/iv_word_native_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_delete_24dp"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_word_native"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+
 
 
                 <ImageView
                     android:id="@+id/iv_word_native_edit"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:onClick="OnEditCardNative"
                     android:src="@drawable/ic_edit_black_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@+id/iv_word_native"
@@ -143,22 +137,14 @@
                     app:layout_constraintLeft_toLeftOf="@id/iv_word_other"
                     app:layout_constraintRight_toRightOf="@id/iv_word_other"
                     app:layout_constraintTop_toTopOf="@id/iv_word_other"
-                    tools:text="Доктор" />
-
-                <ImageView
-                    android:id="@+id/iv_word_other_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_delete_24dp"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_word_other"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    tools:text="Doktorka" />
 
 
                 <ImageView
                     android:id="@+id/iv_word_other_edit"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:onClick="OnEditCardOther"
                     android:src="@drawable/ic_edit_black_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@+id/iv_word_other"
@@ -180,8 +166,8 @@
                     android:id="@+id/iv_translate_other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_translate"
                     android:onClick="OnTranslateOther"
+                    android:src="@drawable/ic_translate"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@id/et_word_other"

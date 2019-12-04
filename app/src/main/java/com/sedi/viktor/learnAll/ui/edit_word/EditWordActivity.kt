@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -12,6 +13,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -23,9 +25,24 @@ import com.sedi.viktor.learnAll.data.remote.YandexTranslater
 import kotlinx.android.synthetic.main.word_edit_layout_activity.*
 import org.json.JSONException
 import org.json.JSONObject
+import java.time.format.TextStyle
 
 
 class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseCallbackImpl {
+
+
+    companion object {
+        lateinit var firstCardState: CardState
+        lateinit var secondCardState: CardState
+        var modifyingItem = ModifyingCard.NONE
+        var direction = Direction.DEFAULT
+        const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
+        const val REQ_CODE_SPEECH_INPUT = 5
+    }
+
+
+    var wordItem = WordItem("", "")
+    lateinit var yandexTranslater: YandexTranslater
 
 
     override fun onSuccess(response: String) {
@@ -81,16 +98,6 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
             Log.e("LearnAll", e.message!!)
     }
 
-    companion object {
-        var direction = Direction.DEFAULT
-        const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
-        const val REQ_CODE_SPEECH_INPUT = 5
-    }
-
-
-    var wordItem = WordItem("", "")
-    lateinit var yandexTranslater: YandexTranslater
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,6 +143,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
+
 
     }
 
@@ -290,6 +298,57 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         startActivityForResult(intent, REQ_CODE_SPEECH_INPUT)
     }
 
+
+    fun showPopupMenu(targetView: View) {
+        val popupMenu = PopupMenu(this, targetView)
+        popupMenu.inflate(R.menu.popup_edit_card)
+
+        popupMenu.setOnMenuItemClickListener {
+
+            when (it.itemId) {
+                R.id.menu_edit_card_color -> showChangeColorDialog(ModifyingItem.CARD)
+                R.id.menu_edit_text_color -> showChangeColorDialog(ModifyingItem.TEXT)
+                R.id.menu_edit_text_font -> showEditFontdialog()
+                else -> false
+            }
+
+        }
+        popupMenu.show()
+
+    }
+
+    private fun showEditFontdialog(): Boolean {
+
+
+        return false
+    }
+
+    private fun showChangeColorDialog(modifyingItem: ModifyingItem): Boolean {
+        return false
+    }
+
+
+    fun OnEditCardOther(view: View) {
+
+        modifyingItem = ModifyingCard.OTHER_CARD
+        showPopupMenu(view)
+    }
+
+    fun OnEditCardNative(view: View) {
+
+
+        modifyingItem = ModifyingCard.NATIVE_CARD
+        showPopupMenu(view)
+
+    }
+
+
+    enum class ModifyingCard {
+        NATIVE_CARD,
+        OTHER_CARD,
+        NONE
+    }
+
     enum class Direction {
         SPEAK_OTHER,
         SPEAK_NATIVE,
@@ -297,5 +356,16 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         TRANSLATE_TO_NATIVE,
         DEFAULT
     }
+
+    enum class ModifyingItem {
+        CARD,
+        TEXT,
+    }
+
+
+    /**
+     * Состояние каждой карточки, стиль, фон, цвет текста
+     * */
+    class CardState(val fontColor: Color, val style: TextStyle, val TextColor: Color)
 
 }
