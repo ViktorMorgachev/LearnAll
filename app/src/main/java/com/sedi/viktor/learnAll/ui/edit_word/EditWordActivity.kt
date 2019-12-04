@@ -30,6 +30,9 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
     override fun onSuccess(response: String) {
 
+        iv_edit_native.isEnabled = true
+        iv_edit_other.isEnabled = true
+
         val jObject = JSONObject(response)
         val jArray = jObject.getJSONArray("text")
 
@@ -44,9 +47,10 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         }
 
         when (direction) {
-            Direction.TO_OTHER -> initOthers(result)
-            Direction.TO_NATIVE -> initNative(result)
+            Direction.TRANSLATE_TO_OTHER -> initOthers(result)
+            Direction.TRANSLATE_TO_NATIVE -> initNative(result)
         }
+
 
     }
 
@@ -69,6 +73,10 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     }
 
     override fun onFaillure(e: Exception) {
+
+        iv_edit_native.isEnabled = true
+        iv_edit_other.isEnabled = true
+
         if (e.message != null)
             Log.e("LearnAll", e.message!!)
     }
@@ -76,7 +84,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     companion object {
         var direction = Direction.DEFAULT
         const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
-        const val REQ_CODE_SPEECH_INPUT = 5;
+        const val REQ_CODE_SPEECH_INPUT = 5
     }
 
 
@@ -100,6 +108,9 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         et_word_other.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 iv_translate_other.isEnabled = !TextUtils.isEmpty(et_word_other.text)
+                if (direction == Direction.SPEAK_OTHER) {
+                    translateOther()
+                }
 
             }
 
@@ -113,6 +124,9 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         et_word_native.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 iv_translate_native.isEnabled = !TextUtils.isEmpty(et_word_native.text)
+                if (direction == Direction.SPEAK_NATIVE) {
+                    translateNative()
+                }
 
             }
 
@@ -130,10 +144,18 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     }
 
     fun OnTranslateOther(view: View) {
+        translateOther()
+        view.isEnabled = false
+    }
+
+    private fun translateOther() {
+
+        iv_edit_native.isEnabled = false
+        iv_edit_other.isEnabled = false
 
         et_card_other.text = et_word_other.text.toString()
 
-        direction = Direction.TO_NATIVE
+        direction = Direction.TRANSLATE_TO_NATIVE
 
         yandexTranslater.translate(
             "cs",
@@ -142,19 +164,26 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
             this@EditWordActivity,
             this@EditWordActivity
         )
+    }
 
+
+    fun OnTranslateNative(view: View) {
+
+        translateNative()
 
         view.isEnabled = false
 
 
     }
 
+    private fun translateNative() {
 
-    fun OnTranslateNative(view: View) {
+        iv_edit_native.isEnabled = false
+        iv_edit_other.isEnabled = false
 
         et_card_native.text = et_word_native.text.toString()
 
-        direction = Direction.TO_OTHER
+        direction = Direction.TRANSLATE_TO_OTHER
 
         yandexTranslater.translate(
             "ru",
@@ -163,18 +192,8 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
             this@EditWordActivity,
             this@EditWordActivity
         )
-
-
-        view.isEnabled = false
-
-
     }
 
-    enum class Direction {
-        TO_OTHER,
-        TO_NATIVE,
-        DEFAULT
-    }
 
     fun onVoiceInputNative(view: View) {
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
@@ -184,7 +203,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
                 Toast.LENGTH_LONG
             ).show()
         }
-        direction = Direction.TO_NATIVE
+        direction = Direction.SPEAK_NATIVE
         checkVoicePermissions()
 
     }
@@ -210,7 +229,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
             ).show()
         }
 
-        direction = Direction.TO_OTHER
+        direction = Direction.SPEAK_OTHER
         checkVoicePermissions()
 
     }
@@ -238,16 +257,16 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQ_CODE_SPEECH_INPUT && resultCode == Activity.RESULT_OK) {
 
+
+            var text = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!![0]
             when (direction) {
-
-
-                Direction.TO_NATIVE -> {
-                    et_card_native.text =
-                        data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!![0]
+                Direction.SPEAK_NATIVE -> {
+                    et_card_native.text = text
+                    et_word_native.setText(text)
                 }
-                Direction.TO_OTHER -> {
-                    et_card_other.text =
-                        data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!![0]
+                Direction.SPEAK_OTHER -> {
+                    et_card_other.text = text
+                    et_word_other.setText(text)
                 }
                 else -> return
             }
@@ -263,12 +282,20 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
 
         when (direction) {
-            Direction.TO_NATIVE -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ru")
-            Direction.TO_OTHER -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "cs")
+            Direction.SPEAK_NATIVE -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ru")
+            Direction.SPEAK_OTHER -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "cs")
         }
 
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Скажи что хотел")
         startActivityForResult(intent, REQ_CODE_SPEECH_INPUT)
+    }
+
+    enum class Direction {
+        SPEAK_OTHER,
+        SPEAK_NATIVE,
+        TRANSLATE_TO_OTHER,
+        TRANSLATE_TO_NATIVE,
+        DEFAULT
     }
 
 }
