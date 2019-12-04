@@ -23,6 +23,7 @@ import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
+import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeStyleListener
 import kotlinx.android.synthetic.main.word_edit_layout_activity.*
@@ -52,13 +53,27 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
 
     // Ovveride and callbacks
-    override fun onChanged(color: Color) {
+    override fun onColorChanged(color: Int) {
+
+
+        when (modifyingCard) {
+            ModifyingCard.NATIVE_CARD -> changeNativeCardColor()
+            ModifyingCard.OTHER_CARD -> changeOtherCardColor()
+        }
 
 
     }
 
-    override fun onChanged(textStyle: TextStyle) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun changeOtherCardColor() {
+
+    }
+
+    private fun changeNativeCardColor() {
+
+    }
+
+    override fun onTextStyleChanged(textStyle: TextStyle) {
+
     }
 
     override fun onSuccess(response: String) {
@@ -344,9 +359,21 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
         this.modifyingItem = modifyingItem
 
-        alertDialog = AlertDialog.Builder(this).create()
+        val dialogColorChooser = DialogColorChooser(
+            this,
+            this,
+            listOf<Int>(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark)
+        )
+        dialogColorChooser.setOnDismissListener { onDismisedColorChoosedDialog() }
+
+        dialogColorChooser.show()
 
         return false
+    }
+
+    private fun onDismisedColorChoosedDialog() {
+        modifyingCard = ModifyingCard.NONE
+        modifyingItem = ModifyingItem.NONE
     }
 
 
