@@ -18,4 +18,5 @@
     <string name="text_color">Цвет текста</string>
     <string name="card_color">Цвет фона</string>
     <string name="text_font">Стиль</string>
+    <string name="select_color">Выберите цвет</string>
 </resources>

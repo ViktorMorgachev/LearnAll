@@ -364,6 +364,8 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
             this,
             listOf<Int>(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark)
         )
+
+        dialogColorChooser.setTitle(R.string.select_color)
         dialogColorChooser.setOnDismissListener { onDismisedColorChoosedDialog() }
 
         dialogColorChooser.show()
