@@ -3,8 +3,7 @@
     android:id="@+id/parent_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
-    android:columnCount="3"
-    android:rowCount="3">
+    android:columnCount="6"
+    android:rowCount="9">
 
 </GridLayout>

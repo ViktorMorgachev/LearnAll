@@ -14,6 +14,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +38,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
 
     companion object {
+
         const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
         const val REQ_CODE_SPEECH_INPUT = 5
     }
@@ -57,18 +59,30 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
 
         when (modifyingCard) {
-            ModifyingCard.NATIVE_CARD -> changeNativeCardColor()
-            ModifyingCard.OTHER_CARD -> changeOtherCardColor()
+            ModifyingCard.NATIVE_CARD -> changeNativeColor(color)
+            ModifyingCard.OTHER_CARD -> changeOtherColor(color)
         }
 
 
     }
 
-    private fun changeOtherCardColor() {
+    private fun changeOtherColor(color: Int) {
+
+        when (modifyingItem) {
+            ModifyingItem.CARD -> iv_word_other.setBackgroundColor(getColor(color))
+            ModifyingItem.TEXT -> et_card_other.setTextColor(getColor(color))
+        }
+
 
     }
 
-    private fun changeNativeCardColor() {
+    private fun changeNativeColor(color: Int) {
+
+        when (modifyingItem) {
+            ModifyingItem.CARD -> iv_word_native.setBackgroundColor(getColor(color))
+            ModifyingItem.TEXT -> et_card_native.setTextColor(getColor(color))
+        }
+
 
     }
 
@@ -132,6 +146,8 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         setContentView(R.layout.word_edit_layout_activity)
 
@@ -209,9 +225,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     fun OnTranslateNative(view: View) {
 
         translateNative()
-
         view.isEnabled = false
-
 
     }
 
@@ -342,7 +356,6 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
                 R.id.menu_edit_text_font -> showEditFontdialog()
                 else -> false
             }
-
         }
         popupMenu.show()
 
@@ -361,11 +374,16 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
         val dialogColorChooser = DialogColorChooser(
             this,
-            this,
-            listOf<Int>(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark)
+            this
         )
 
         dialogColorChooser.setTitle(R.string.select_color)
+        dialogColorChooser.setPositiveButton(
+            android.R.string.ok
+        ) { _, _ ->
+            dialogColorChooser.dismiss()
+        }
+
         dialogColorChooser.setOnDismissListener { onDismisedColorChoosedDialog() }
 
         dialogColorChooser.show()

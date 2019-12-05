@@ -21,28 +21,33 @@ class CustomColorPickerItem(context: Context?, attrs: AttributeSet?) :
 
     init {
         LayoutInflater.from(context).inflate(R.layout.item_selected_color, this, true)
-        parent_root.setOnClickListener { onClickListener() }
     }
 
-
-    fun onClickListener(action: (() -> Unit) = {}): Int {
-        if (iv_cheched.visibility == View.VISIBLE)
-            iv_cheched.invisible()
-        else iv_cheched.visible()
-
-        return iv_cheched.visibility
-    }
 
     fun onClickListener(
         onClickItemCallback: DialogColorChooser.onClickItemCallback,
         position: Int
     ) {
-        if (iv_cheched.visibility == View.VISIBLE)
-            iv_cheched.invisible()
-        else iv_cheched.visible()
 
-        onClickItemCallback.onClicked(iv_cheched.visibility, position)
+        parent_root.setOnClickListener {
 
+            if (iv_cheched.visibility == View.VISIBLE)
+                iv_cheched.invisible()
+            else iv_cheched.visible()
+
+            onClickItemCallback.onClicked(
+                iv_cheched.visibility,
+                position
+            )
+        }
+
+
+    }
+
+    fun setChecked(isChecked: Boolean) {
+        if (isChecked)
+            iv_cheched.visible()
+        else iv_cheched.invisible()
     }
 
 

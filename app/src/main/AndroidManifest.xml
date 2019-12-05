@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <meta-data
         android:name="com.google.firebase.ml.vision.DEPENDENCIES"
@@ -19,16 +19,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".ui.edit_word.EditWordActivity">
-          <!--  android:theme="@style/Theme.AppCompat.NoActionBar"-->
+        <activity android:name=".ui.edit_word.EditWordActivity">
+            <!--  android:theme="@style/Theme.AppCompat.NoActionBar"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-       <!-- <activity android:name=".ui.edit_word.EditWordActivity" />-->
+        <!-- <activity android:name=".ui.edit_word.EditWordActivity" />-->
 
         <receiver android:name=".services.NetworkReceiver">
             <intent-filter>

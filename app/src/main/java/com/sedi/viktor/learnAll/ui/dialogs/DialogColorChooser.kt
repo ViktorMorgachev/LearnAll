@@ -15,16 +15,39 @@ import kotlinx.android.synthetic.main.color_picker_dialog.view.*
 class DialogColorChooser :
     AlertDialog.Builder, DialogInterface {
 
+
     private var changeColorListener: ChangeColorListener
-    private var colors: List<Int>
+    private val customColorPickerItems = ArrayList<CustomColorPickerItem>()
+
+    companion object {
+        var colors = listOf(
+            R.color.black,
+            R.color.blue,
+            R.color.dark_green,
+            R.color.orange,
+            R.color.peace_color,
+            R.color.light_green,
+            R.color.pink,
+            R.color.red,
+            R.color.violet,
+            R.color.white,
+            R.color.yellow,
+            R.color.color_200_1,
+            R.color.color_200_2,
+            R.color.color_200_4,
+            R.color.color_200_5,
+            R.color.color_200_6,
+            R.color.color_200_7,
+            R.color.color_200_8
+
+        )
+    }
 
     constructor(
         context: Context?,
-        changeColorListener: ChangeColorListener,
-        colors: List<Int>
+        changeColorListener: ChangeColorListener
     ) : super(context) {
 
-        this.colors = colors
         this.changeColorListener = changeColorListener
 
         setView(getView(context, colors))
@@ -41,9 +64,9 @@ class DialogColorChooser :
 
         initListeners()
 
-        var customColorPickerItem: CustomColorPickerItem
 
         val parser = view.resources.getXml(R.xml.item_selected_color)
+
         try {
             parser.next()
             parser.nextTag()
@@ -58,13 +81,15 @@ class DialogColorChooser :
         if (count < 0) return view
 
 
-        for (i in 0 until colors.size) {
+        for (i in colors.indices) {
 
-            customColorPickerItem = CustomColorPickerItem(context, attr)
+            val customColorPickerItem = CustomColorPickerItem(context, attr)
             customColorPickerItem.setBackgroundIconColor(colors[i])
 
             // Вешаем слушателей
             customColorPickerItem.onClickListener(clickItemCallback, i)
+            customColorPickerItems.add(customColorPickerItem)
+
             view.parent_root.addView(customColorPickerItem)
         }
 
@@ -77,24 +102,28 @@ class DialogColorChooser :
     private fun initListeners() {
         clickItemCallback = object : onClickItemCallback {
             override fun onClicked(visibility: Int, colorPosition: Int) {
-                if (visibility == View.VISIBLE)
+                if (visibility == View.VISIBLE) {
+
                     changeColorListener.onColorChanged(colors[colorPosition])
+
+                    for (i in 0 until customColorPickerItems.size) {
+                        customColorPickerItems[i].setChecked(false)
+                    }
+
+                    customColorPickerItems[colorPosition].setChecked(true)
+
+                }
             }
 
         }
     }
 
-    private fun clickedItem(i: Int) {
-
-    }
-
-
     override fun dismiss() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun cancel() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
 
