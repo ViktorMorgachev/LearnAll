@@ -21,8 +21,27 @@ class WordItem : BaseObservable {
             notifyPropertyChanged(BR.nativeName)
         }
 
-    constructor(otherName: String, nativeName: String) :
+
+    var cardStateOther: CardState = CardState()
+        set(value) {
+            field = value
+
+        }
+
+    var cardStateNative: CardState = CardState()
+        set(value) {
+            field = value
+        }
+
+    constructor(
+        otherName: String,
+        nativeName: String,
+        cardStateNative: CardState,
+        cardStateOther: CardState
+    ) :
             super() {
+        this.cardStateNative = cardStateNative
+        this.cardStateOther = cardStateOther
         this.otherName = otherName
         this.nativeName = nativeName
     }

@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
+import com.sedi.viktor.learnAll.data.models.CardState
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
 import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
@@ -44,14 +45,13 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     }
 
 
-    lateinit var firstCardState: CardState
-    lateinit var secondCardState: CardState
-    var modifyingCard = ModifyingCard.NONE
-    var modifyingItem = ModifyingItem.NONE
-    var direction = Direction.DEFAULT
-    lateinit var alertDialog: AlertDialog
-    var wordItem = WordItem("", "")
-    lateinit var yandexTranslater: YandexTranslater
+    private lateinit var firstCardState: CardState
+    private lateinit var secondCardState: CardState
+    private var modifyingCard = ModifyingCard.NONE
+    private var modifyingItem = ModifyingItem.NONE
+    private var direction = Direction.DEFAULT
+    private lateinit var alertDialog: AlertDialog
+    private lateinit var yandexTranslater: YandexTranslater
 
 
     // Ovveride and callbacks
@@ -433,9 +433,6 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
     }
 
 
-    /**
-     * Состояние каждой карточки, стиль, фон, цвет текста
-     * */
-    class CardState(val fontColor: Color, val style: TextStyle, val TextColor: Color)
+
 
 }
