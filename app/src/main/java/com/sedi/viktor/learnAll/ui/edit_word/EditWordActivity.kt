@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -20,10 +19,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
+import com.sedi.viktor.learnAll.Color
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.CardState
-import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
 import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
@@ -55,32 +54,34 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
 
     // Ovveride and callbacks
-    override fun onColorChanged(color: Int) {
+    override fun onColorChanged(color: Color) {
 
 
         when (modifyingCard) {
             ModifyingCard.NATIVE_CARD -> changeNativeColor(color)
             ModifyingCard.OTHER_CARD -> changeOtherColor(color)
+            else -> TODO()
         }
 
 
     }
 
-    private fun changeOtherColor(color: Int) {
+    private fun changeOtherColor(color: Color) {
 
         when (modifyingItem) {
-            ModifyingItem.CARD -> iv_word_other.setBackgroundColor(getColor(color))
-            ModifyingItem.TEXT -> et_card_other.setTextColor(getColor(color))
+            ModifyingItem.CARD -> iv_word_other.setBackgroundColor(getColor(color.color))
+            ModifyingItem.TEXT -> et_card_other.setTextColor(getColor(color.color))
+            ModifyingItem.NONE -> TODO()
         }
 
 
     }
 
-    private fun changeNativeColor(color: Int) {
+    private fun changeNativeColor(color: Color) {
 
         when (modifyingItem) {
-            ModifyingItem.CARD -> iv_word_native.setBackgroundColor(getColor(color))
-            ModifyingItem.TEXT -> et_card_native.setTextColor(getColor(color))
+            ModifyingItem.CARD -> iv_word_native.setBackgroundColor(getColor(color.color))
+            ModifyingItem.TEXT -> et_card_native.setTextColor(getColor(color.color))
         }
 
 
@@ -111,6 +112,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         when (direction) {
             Direction.TRANSLATE_TO_OTHER -> initOthers(result)
             Direction.TRANSLATE_TO_NATIVE -> initNative(result)
+            else -> TODO()
         }
 
 
@@ -194,9 +196,9 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
     }
 
-    fun SaveWord(view: View) {
+    /* fun SaveWord(view: View) {
 
-    }
+     }*/
 
     fun OnTranslateOther(view: View) {
         translateOther()
@@ -384,6 +386,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
             dialogColorChooser.dismiss()
         }
 
+
         dialogColorChooser.setOnDismissListener { onDismisedColorChoosedDialog() }
 
         dialogColorChooser.show()
@@ -431,8 +434,6 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
         TEXT,
         NONE
     }
-
-
 
 
 }

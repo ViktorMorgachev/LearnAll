@@ -4,7 +4,7 @@
     android:id="@+id/parent_root"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="5dp">
+    android:padding="2dp">
 
     <ImageView
         android:id="@+id/iv_color_circle"

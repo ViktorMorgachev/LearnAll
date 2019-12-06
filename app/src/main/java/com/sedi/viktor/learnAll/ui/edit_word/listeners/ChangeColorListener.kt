@@ -1,7 +1,8 @@
 package com.sedi.viktor.learnAll.ui.edit_word.listeners
 
-import android.graphics.Color
+import com.sedi.viktor.learnAll.Color
+
 
 interface ChangeColorListener {
-    fun onColorChanged(color: Int)
+    fun onColorChanged(color: Color)
 }

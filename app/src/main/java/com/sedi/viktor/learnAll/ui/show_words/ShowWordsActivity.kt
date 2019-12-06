@@ -1,21 +1,20 @@
 package com.sedi.viktor.learnAll.ui.show_words
 
 import android.os.Bundle
-import android.os.Handler
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sedi.viktor.learnAll.R
-import com.sedi.viktor.learnAll.databinding.WordsActivityBinding
+import com.sedi.viktor.learnAll.data.models.CardState
 import com.sedi.viktor.learnAll.data.models.WordItem
+import com.sedi.viktor.learnAll.databinding.WordsActivityBinding
 import kotlinx.android.synthetic.main.words_activity.*
 
 class ShowWordsActivity : AppCompatActivity() {
 
 
     private val items = listOf(
-        WordItem("Girl", "Девочка")
+        WordItem("Girl", "Девочка", CardState(), CardState())
     )
 
     lateinit var binding: WordsActivityBinding
@@ -32,7 +31,6 @@ class ShowWordsActivity : AppCompatActivity() {
 
 
     }
-
 
 
 }

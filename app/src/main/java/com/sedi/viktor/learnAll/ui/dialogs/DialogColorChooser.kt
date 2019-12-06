@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.util.Xml
 import android.view.LayoutInflater
 import android.view.View
+import com.sedi.viktor.learnAll.Color
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.custom.CustomColorPickerItem
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
@@ -21,25 +22,26 @@ class DialogColorChooser :
 
     companion object {
         var colors = listOf(
-            R.color.black,
-            R.color.blue,
-            R.color.dark_green,
-            R.color.orange,
-            R.color.peace_color,
-            R.color.light_green,
-            R.color.pink,
-            R.color.red,
-            R.color.violet,
-            R.color.white,
-            R.color.yellow,
-            R.color.color_200_1,
-            R.color.color_200_2,
-            R.color.color_200_4,
-            R.color.color_200_5,
-            R.color.color_200_6,
-            R.color.color_200_7,
-            R.color.color_200_8
-
+            Color.BLUE,
+            Color.RED,
+            Color.DARK_GREEN,
+            Color.BLACK,
+            Color.LIGHT_GREEN,
+            Color.ORANGE,
+            Color.WHITE,
+            Color.YELLOW,
+            Color.VIOLET,
+            Color.PINK,
+            Color.PEACE_COLOR,
+            Color.COLOR1,
+            Color.COLOR2,
+            Color.COLOR3,
+            Color.COLOR3,
+            Color.COLOR4,
+            Color.COLOR5,
+            Color.COLOR6,
+            Color.COLOR7,
+            Color.COLOR8
         )
     }
 
@@ -56,7 +58,7 @@ class DialogColorChooser :
 
     private lateinit var clickItemCallback: onClickItemCallback
 
-    private fun getView(context: Context?, colors: List<Int>): View {
+    private fun getView(context: Context?, colors: List<Color>): View {
 
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.color_picker_dialog, null)
@@ -84,7 +86,7 @@ class DialogColorChooser :
         for (i in colors.indices) {
 
             val customColorPickerItem = CustomColorPickerItem(context, attr)
-            customColorPickerItem.setBackgroundIconColor(colors[i])
+            customColorPickerItem.setBackgroundIconColor(colors[i].color)
 
             // Вешаем слушателей
             customColorPickerItem.onClickListener(clickItemCallback, i)
@@ -101,16 +103,16 @@ class DialogColorChooser :
 
     private fun initListeners() {
         clickItemCallback = object : onClickItemCallback {
-            override fun onClicked(visibility: Int, colorPosition: Int) {
+            override fun onClicked(visibility: Int, color: Color, position: Int) {
                 if (visibility == View.VISIBLE) {
 
-                    changeColorListener.onColorChanged(colors[colorPosition])
+                    changeColorListener.onColorChanged(color)
 
                     for (i in 0 until customColorPickerItems.size) {
                         customColorPickerItems[i].setChecked(false)
                     }
 
-                    customColorPickerItems[colorPosition].setChecked(true)
+                    customColorPickerItems[position].setChecked(true)
 
                 }
             }
@@ -128,7 +130,7 @@ class DialogColorChooser :
 
 
     interface onClickItemCallback {
-        fun onClicked(visibility: Int, colorPosition: Int)
+        fun onClicked(visibility: Int, color: Color, position: Int)
     }
 
 }
