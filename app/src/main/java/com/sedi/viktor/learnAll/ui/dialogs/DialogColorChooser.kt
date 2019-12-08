@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import com.sedi.viktor.learnAll.Color
 import com.sedi.viktor.learnAll.R
+import com.sedi.viktor.learnAll.convertColorIntToColor
 import com.sedi.viktor.learnAll.custom.CustomColorPickerItem
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
 import kotlinx.android.synthetic.main.color_picker_dialog.view.*
@@ -28,7 +29,6 @@ class DialogColorChooser :
             Color.BLACK,
             Color.LIGHT_GREEN,
             Color.ORANGE,
-            Color.WHITE,
             Color.YELLOW,
             Color.VIOLET,
             Color.PINK,
@@ -85,7 +85,7 @@ class DialogColorChooser :
 
         for (i in colors.indices) {
 
-            val customColorPickerItem = CustomColorPickerItem(context, attr)
+            val customColorPickerItem = CustomColorPickerItem(context!!, attr)
             customColorPickerItem.setBackgroundIconColor(colors[i].color)
 
             // Вешаем слушателей
@@ -95,7 +95,6 @@ class DialogColorChooser :
             view.parent_root.addView(customColorPickerItem)
         }
 
-        view.parent_root.invalidate()
 
         return view
 
@@ -103,10 +102,10 @@ class DialogColorChooser :
 
     private fun initListeners() {
         clickItemCallback = object : onClickItemCallback {
-            override fun onClicked(visibility: Int, color: Color, position: Int) {
+            override fun onClicked(visibility: Int, color: Int, position: Int) {
                 if (visibility == View.VISIBLE) {
 
-                    changeColorListener.onColorChanged(color)
+                    changeColorListener.onColorChanged(convertColorIntToColor(color))
 
                     for (i in 0 until customColorPickerItems.size) {
                         customColorPickerItems[i].setChecked(false)
@@ -130,7 +129,7 @@ class DialogColorChooser :
 
 
     interface onClickItemCallback {
-        fun onClicked(visibility: Int, color: Color, position: Int)
+        fun onClicked(visibility: Int, color: Int, position: Int)
     }
 
 }
