@@ -23,11 +23,13 @@ import com.sedi.viktor.learnAll.Color
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.CardState
+import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
 import com.sedi.viktor.learnAll.ui.BaseActivity
 import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeStyleListener
+import io.realm.Realm
 import kotlinx.android.synthetic.main.word_edit_layout_activity.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -45,13 +47,15 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     }
 
 
-    private lateinit var firstCardState: CardState
-    private lateinit var secondCardState: CardState
+    private var wordItem = WordItem()
+    private val cardStateNative = CardState()
+    private val cardStateOther = CardState()
     private var modifyingCard = ModifyingCard.NONE
     private var modifyingItem = ModifyingItem.NONE
     private var direction = Direction.DEFAULT
     private lateinit var alertDialog: AlertDialog
     private lateinit var yandexTranslater: YandexTranslater
+    private val realm = Realm.getDefaultInstance()
 
 
     // Ovveride and callbacks
@@ -82,7 +86,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         when (modifyingItem) {
             ModifyingItem.CARD -> iv_word_native.setBackgroundColor(getColor(color!!.color))
-            ModifyingItem.TEXT -> et_card_native.setTextColor(getColor(color!!k.color))
+            ModifyingItem.TEXT -> et_card_native.setTextColor(getColor(color!!.color))
         }
 
 
@@ -169,7 +173,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         et_word_other.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 iv_translate_other.isEnabled = !TextUtils.isEmpty(et_word_other.text)
-                if (direction == Direction.SPEAK_OTHER) {
+                if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(et_word_other.text)) {
                     translateOther()
                 }
 
@@ -185,7 +189,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         et_word_native.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 iv_translate_native.isEnabled = !TextUtils.isEmpty(et_word_native.text)
-                if (direction == Direction.SPEAK_NATIVE) {
+                if (direction == Direction.SPEAK_NATIVE && !TextUtils.isEmpty(et_card_native.text)) {
                     translateNative()
                 }
 
@@ -240,6 +244,8 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         iv_edit_native.isEnabled = false
         iv_edit_other.isEnabled = false
+
+
 
         et_card_native.text = et_word_native.text.toString()
 
@@ -397,6 +403,28 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         dialogColorChooser.show()
 
         return false
+    }
+
+    fun SaveWord(view: View) {
+        if (TextUtils.isEmpty(et_word_other.text)) return
+        val realmResults =
+            realm.where(WordItem::class.java).contains("otherName", et_card_other.text.toString())
+        if (realmResults.count() < 0) {
+
+            realm.beginTransaction()
+            realm.executeTransactionAsync {
+                val wordItem = it.createObject(WordItem::class.java)
+                wordItem.cardStateNative = cardStateNative.copy()
+                wordItem.cardStateOther = cardStateOther.copy()
+                wordItem.nativeName = et_card_native.text.toString()
+                wordItem.otherName = et_card_other.text.toString()
+            }
+            realm.commitTransaction()
+
+            toast("Успешно было сохранено")
+
+        }
+
     }
 
     private fun onDismisedColorChoosedDialog() {
