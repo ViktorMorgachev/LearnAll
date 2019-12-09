@@ -55,7 +55,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
 
     // Ovveride and callbacks
-    override fun onColorChanged(color: Color) {
+    override fun onColorChanged(color: Color?) {
 
 
         when (modifyingCard) {
@@ -67,22 +67,22 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     }
 
-    private fun changeOtherColor(color: Color) {
+    private fun changeOtherColor(color: Color?) {
 
         when (modifyingItem) {
-            ModifyingItem.CARD -> iv_word_other.setBackgroundColor(getColor(color.color))
-            ModifyingItem.TEXT -> et_card_other.setTextColor(getColor(color.color))
+            ModifyingItem.CARD -> iv_word_other.setBackgroundColor(getColor(color!!.color))
+            ModifyingItem.TEXT -> et_card_other.setTextColor(getColor(color!!.color))
             ModifyingItem.NONE -> TODO()
         }
 
 
     }
 
-    private fun changeNativeColor(color: Color) {
+    private fun changeNativeColor(color: Color?) {
 
         when (modifyingItem) {
-            ModifyingItem.CARD -> iv_word_native.setBackgroundColor(getColor(color.color))
-            ModifyingItem.TEXT -> et_card_native.setTextColor(getColor(color.color))
+            ModifyingItem.CARD -> iv_word_native.setBackgroundColor(getColor(color!!.color))
+            ModifyingItem.TEXT -> et_card_native.setTextColor(getColor(color!!k.color))
         }
 
 

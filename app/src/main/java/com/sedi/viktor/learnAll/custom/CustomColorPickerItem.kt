@@ -59,12 +59,12 @@ class CustomColorPickerItem(context: Context, attrs: AttributeSet?, var color: I
     }
 
 
-    private fun getBackGroundColor(drawable: Drawable): Color {
+    private fun getBackGroundColor(drawable: Drawable): Color? {
         val gradientDrawable = drawable as GradientDrawable
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return convertColorIntToColor(gradientDrawable.color!!.defaultColor)
         }
-        return Color.DEFAULT
+        return null
     }
 
     fun setBackgroundIconColor(color: Int) {
