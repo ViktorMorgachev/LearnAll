@@ -20,14 +20,13 @@ import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
 import kotlinx.android.synthetic.main.item_selected_color.view.*
 
 
-class CustomColorPickerItem(context: Context, attrs: AttributeSet?) :
+class CustomColorPickerItem(context: Context, attrs: AttributeSet?, var color: Int) :
     ConstraintLayout(context, attrs) {
 
-    var color: Int
 
     init {
         LayoutInflater.from(context).inflate(R.layout.item_selected_color, this, true)
-        color = resources.getColor(Color.DEFAULT.color, context.theme)
+        DrawableCompat.setTint(iv_color_circle.drawable, ContextCompat.getColor(context, color))
     }
 
 
@@ -70,7 +69,7 @@ class CustomColorPickerItem(context: Context, attrs: AttributeSet?) :
     }
 
     fun setBackgroundIconColor(color: Int) {
-        val drawable = resources.getDrawable(R.drawable.ic_color_item, context.theme)
+        this.color = color
         DrawableCompat.setTint(iv_color_circle.drawable, ContextCompat.getColor(context, color))
     }
 

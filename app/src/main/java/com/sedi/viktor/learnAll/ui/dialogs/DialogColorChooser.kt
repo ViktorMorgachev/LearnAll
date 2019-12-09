@@ -85,8 +85,7 @@ class DialogColorChooser :
 
         for (i in colors.indices) {
 
-            val customColorPickerItem = CustomColorPickerItem(context!!, attr)
-            customColorPickerItem.setBackgroundIconColor(colors[i].color)
+            val customColorPickerItem = CustomColorPickerItem(context!!, attr, colors[i].color)
 
             // Вешаем слушателей
             customColorPickerItem.onClickListener(clickItemCallback, i)
