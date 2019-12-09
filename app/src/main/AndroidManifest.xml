@@ -27,6 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.BaseActivity" />
         <!-- <activity android:name=".ui.edit_word.EditWordActivity" />-->
 
         <receiver android:name=".services.NetworkReceiver">

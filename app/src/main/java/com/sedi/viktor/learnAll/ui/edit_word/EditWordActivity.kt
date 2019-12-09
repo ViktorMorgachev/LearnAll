@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -16,7 +17,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
 import com.sedi.viktor.learnAll.Color
@@ -24,6 +24,7 @@ import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.CardState
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
+import com.sedi.viktor.learnAll.ui.BaseActivity
 import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeStyleListener
@@ -33,7 +34,7 @@ import org.json.JSONObject
 import java.time.format.TextStyle
 
 
-class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseCallbackImpl,
+class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallbackImpl,
     ChangeColorListener, ChangeStyleListener {
 
 
@@ -139,6 +140,7 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
     private fun initOthers(response: String) {
 
+        sayText(response)
         iv_translate_other.isEnabled = true
         et_word_other.post { et_word_other.setText(response) }
         et_card_other.post { et_card_other.setText(response) }
@@ -148,6 +150,9 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (textToSpeech == null)
+            initTTS()
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
@@ -411,6 +416,13 @@ class EditWordActivity : AppCompatActivity(), LifecycleOwner, TranslateResponseC
 
         modifyingCard = ModifyingCard.NATIVE_CARD
         showPopupMenu(view)
+
+    }
+
+    fun sayText(response: String) {
+        val utteranceId = this.hashCode().toString()
+        val speechStatus =
+            textToSpeech?.speak(response, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
 
     }
 
