@@ -50,7 +50,6 @@ class CustomColorPickerItem(context: Context, attrs: AttributeSet?, var color: I
             )
         }
 
-
     }
 
     fun setChecked(isChecked: Boolean) {

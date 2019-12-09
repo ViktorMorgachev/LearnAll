@@ -16,12 +16,13 @@
     <color name="black">#000000</color>
 
 
-    <color name="color_200_1">#F48FB1</color>
-    <color name="color_200_2">#EF9A9A</color>
+    <color name="color_200_1">#EF9A9A</color>
+    <color name="color_200_2">#F48FB1</color>
     <color name="color_200_3">#CE93D8</color>
-    <color name="color_200_4">#B39DDB</color>
-    <color name="color_200_5">#9FA8DA</color>
-    <color name="color_200_6">#90CAF9</color>
-    <color name="color_200_7">#80DEEA</color>
-    <color name="color_200_8">#80CBC4</color>
+    <color name="color_200_4">#9FA8DA</color>
+    <color name="color_200_5">#81D4FA</color>
+    <color name="color_200_6">#80CBC4</color>
+    <color name="color_200_7">#E6EE9C</color>
+    <color name="color_200_8">#FFE082</color>
+    <color name="color_200_9">#FFAB91</color>
 </resources>

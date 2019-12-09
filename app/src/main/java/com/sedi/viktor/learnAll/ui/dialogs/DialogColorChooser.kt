@@ -41,7 +41,8 @@ class DialogColorChooser :
             Color.COLOR5,
             Color.COLOR6,
             Color.COLOR7,
-            Color.COLOR8
+            Color.COLOR8,
+            Color.COLOR9
         )
     }
 
