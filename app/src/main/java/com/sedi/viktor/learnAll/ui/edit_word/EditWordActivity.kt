@@ -29,7 +29,6 @@ import com.sedi.viktor.learnAll.ui.BaseActivity
 import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeStyleListener
-import io.realm.Realm
 import kotlinx.android.synthetic.main.word_edit_layout_activity.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -55,7 +54,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     private var direction = Direction.DEFAULT
     private lateinit var alertDialog: AlertDialog
     private lateinit var yandexTranslater: YandexTranslater
-    private val realm = Realm.getDefaultInstance()
 
 
     // Ovveride and callbacks
@@ -407,23 +405,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     fun SaveWord(view: View) {
         if (TextUtils.isEmpty(et_word_other.text)) return
-        val realmResults =
-            realm.where(WordItem::class.java).contains("otherName", et_card_other.text.toString())
-        if (realmResults.count() < 0) {
 
-            realm.beginTransaction()
-            realm.executeTransactionAsync {
-                val wordItem = it.createObject(WordItem::class.java)
-                wordItem.cardStateNative = cardStateNative.copy()
-                wordItem.cardStateOther = cardStateOther.copy()
-                wordItem.nativeName = et_card_native.text.toString()
-                wordItem.otherName = et_card_other.text.toString()
-            }
-            realm.commitTransaction()
-
-            toast("Успешно было сохранено")
-
-        }
 
     }
 

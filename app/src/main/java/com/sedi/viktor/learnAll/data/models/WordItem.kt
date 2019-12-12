@@ -1,37 +1,44 @@
 package com.sedi.viktor.learnAll.data.models
 
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
-import com.sedi.viktor.learnAll.BR
-import io.realm.RealmModel
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.RealmClass
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@RealmClass
-class WordItem : BaseObservable, RealmModel {
 
-    @PrimaryKey
-    private val primaryKey: Long = 0
+@Entity
+class WordItem {
 
-    @get:Bindable
+    @PrimaryKey(autoGenerate = true)
+    val primaryKey: Int = 0
+
+
+    var learned: Boolean = false
+        set(value) {
+            field = value
+        }
+
+
+    @ColumnInfo(name = "other_name")
     var otherName: String = ""
         set(value) {
             field = value
-            notifyPropertyChanged(BR.otherName)
+
         }
 
-    @get:Bindable
+    @ColumnInfo(name = "native_name")
     var nativeName: String = ""
         set(value) {
             field = value
-            notifyPropertyChanged(BR.nativeName)
+
         }
 
+    @ColumnInfo(name = "card_state_other")
     var cardStateOther: CardState = CardState()
         set(value) {
             field = value
         }
 
+    @ColumnInfo(name = "card_state_native")
     var cardStateNative: CardState = CardState()
         set(value) {
             field = value
