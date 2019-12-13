@@ -10,7 +10,6 @@ import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 @Dao
 interface WordItemDao {
 
-
     @Query("SELECT * FROM worditemroommodel")
     fun getAll(): List<WordItem>
 
