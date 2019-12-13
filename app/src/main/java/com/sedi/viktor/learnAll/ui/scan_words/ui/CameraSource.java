@@ -241,7 +241,7 @@ public class CameraSource {
         }
 
         /**
-         * Creates an instance of the camera source.
+         * Creates an INSTANCE of the camera source.
          */
         public CameraSource build() {
             cameraSource.frameProcessor = cameraSource.new FrameProcessingRunnable(detector);

@@ -21,6 +21,8 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
 import com.sedi.viktor.learnAll.Color
 import com.sedi.viktor.learnAll.R
+import com.sedi.viktor.learnAll.data.DatabaseConverter
+import com.sedi.viktor.learnAll.data.WordItemDatabase
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.CardState
 import com.sedi.viktor.learnAll.data.models.WordItem
@@ -40,7 +42,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
 
     companion object {
-
         const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
         const val REQ_CODE_SPEECH_INPUT = 5
     }
@@ -52,6 +53,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     private var modifyingCard = ModifyingCard.NONE
     private var modifyingItem = ModifyingItem.NONE
     private var direction = Direction.DEFAULT
+    private var db: WordItemDatabase? = null
     private lateinit var alertDialog: AlertDialog
     private lateinit var yandexTranslater: YandexTranslater
 
@@ -152,6 +154,8 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        db = WordItemDatabase.invoke(this)
 
         if (textToSpeech == null)
             initTTS()
@@ -406,6 +410,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     fun SaveWord(view: View) {
         if (TextUtils.isEmpty(et_word_other.text)) return
 
+        db!!.wordItemDao().insert(DatabaseConverter.convertWordItemToRoomModel(wordItem))
 
     }
 

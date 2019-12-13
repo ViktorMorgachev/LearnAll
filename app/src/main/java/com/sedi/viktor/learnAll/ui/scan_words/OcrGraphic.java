@@ -22,7 +22,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.sedi.viktor.learnAll.ui.scan_words.ui.GraphicOverlay;
 
 /**
- * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
+ * Graphic INSTANCE for rendering TextBlock position, size, and ID within an associated graphic
  * overlay view.
  */
 public class OcrGraphic extends GraphicOverlay.Graphic {
