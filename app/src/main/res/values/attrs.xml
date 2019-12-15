@@ -5,4 +5,6 @@
         <attr name="radius" format="float" />
     </declare-styleable>
 
+    <declare-styleable name="CustomToolbar" />
+
 </resources>

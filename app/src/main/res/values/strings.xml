@@ -19,4 +19,5 @@
     <string name="card_color">Цвет фона</string>
     <string name="text_font">Стиль</string>
     <string name="select_color">Выберите цвет</string>
+    <string name="empty_list">Список пустой</string>
 </resources>

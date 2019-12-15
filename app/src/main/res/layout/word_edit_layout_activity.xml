@@ -16,6 +16,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <com.sedi.viktor.learnAll.custom.CustomToolbar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_pictire_card"
                 android:layout_width="wrap_content"

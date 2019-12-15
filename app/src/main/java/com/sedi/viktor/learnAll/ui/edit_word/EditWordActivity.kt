@@ -34,6 +34,7 @@ import com.sedi.viktor.learnAll.ui.dialogs.MessageBox
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeStyleListener
 import kotlinx.android.synthetic.main.word_edit_layout_activity.*
+import kotlinx.android.synthetic.main.words_activity.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.format.TextStyle
@@ -175,8 +176,11 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        db = WordItemDatabase.invoke(this)
 
+
+        setContentView(R.layout.word_edit_layout_activity)
+
+        db = WordItemDatabase.invoke(this)
 
         if (saveWordRunnable == null) {
             saveWordRunnable = Runnable {
@@ -208,7 +212,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
-        setContentView(R.layout.word_edit_layout_activity)
+
+
+        setupViews()
+
         iv_word_native.post { iv_edit_native.setBackgroundColor(Color.DEFAULT.color) }
         iv_word_other.post { iv_edit_other.setBackgroundColor(Color.DEFAULT.color) }
 
@@ -217,6 +224,22 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         yandexTranslater = YandexTranslater(this)
 
     }
+
+    private fun setupViews() {
+
+        appToolBar.apply {
+            setTitle("Редактор карточки")
+            showBackButton()
+            onActionClick {
+                toast("Действие")
+            }
+            onBackClick {
+                toast("Назад")
+            }
+        }
+
+    }
+
 
     private fun initViewListeners() {
 
