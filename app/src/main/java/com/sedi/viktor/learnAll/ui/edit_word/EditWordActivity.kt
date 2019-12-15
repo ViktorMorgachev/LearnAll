@@ -34,7 +34,6 @@ import com.sedi.viktor.learnAll.ui.dialogs.MessageBox
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeColorListener
 import com.sedi.viktor.learnAll.ui.edit_word.listeners.ChangeStyleListener
 import kotlinx.android.synthetic.main.word_edit_layout_activity.*
-import kotlinx.android.synthetic.main.words_activity.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.format.TextStyle
