@@ -79,7 +79,7 @@
 
 
                 <TextView
-                    android:id="@+id/et_card_native"
+                    android:id="@+id/tv_card_native"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
@@ -127,7 +127,7 @@
 
 
                 <TextView
-                    android:id="@+id/et_card_other"
+                    android:id="@+id/tv_card_other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"

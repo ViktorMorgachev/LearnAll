@@ -20,8 +20,13 @@ open class BaseActivity : AppCompatActivity() {
         })
     }
 
-    protected fun toast(text: String) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    protected fun toast(text: String, toastDuration: Int = Toast.LENGTH_SHORT) {
+
+        when (toastDuration) {
+            Toast.LENGTH_SHORT -> Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+            else -> Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+        }
+
     }
 
     override fun onDestroy() {

@@ -14,7 +14,7 @@ class ShowWordsActivity : AppCompatActivity() {
 
 
     private val items = listOf(
-        WordItem("Girl", "Девочка", CardState(), CardState())
+        WordItem()
     )
 
     lateinit var binding: WordsActivityBinding

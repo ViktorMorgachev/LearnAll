@@ -8,7 +8,10 @@ import androidx.room.PrimaryKey
 class WordItemRoomModel {
 
     @PrimaryKey(autoGenerate = true)
-    public val primaryKey: Int = 0
+    public var primaryKey: Int = 0
+    set(value) {
+        field = value
+    }
 
 
     public var learned: Boolean = false

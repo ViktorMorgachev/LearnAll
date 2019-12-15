@@ -22,5 +22,6 @@ enum class Color(val color: Int) {
     COLOR8(R.color.color_200_8),
     COLOR9(R.color.color_200_9),
     DEFAULT(android.R.color.holo_green_dark),
+    GRAY(android.R.color.darker_gray)
 
 }

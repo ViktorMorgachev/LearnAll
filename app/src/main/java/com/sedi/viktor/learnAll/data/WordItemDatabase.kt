@@ -6,8 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.sedi.viktor.learnAll.data.dao.WordItemDao
 import com.sedi.viktor.learnAll.data.models.WordItem
+import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 
-@Database(entities = arrayOf(WordItem::class), exportSchema = false, version = 1)
+@Database(entities = arrayOf(WordItemRoomModel::class), exportSchema = false, version = 1)
 abstract class WordItemDatabase : RoomDatabase() {
 
     abstract fun wordItemDao(): WordItemDao

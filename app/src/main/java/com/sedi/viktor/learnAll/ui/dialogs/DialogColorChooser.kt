@@ -105,7 +105,7 @@ class DialogColorChooser :
             override fun onClicked(visibility: Int, color: Int, position: Int) {
                 if (visibility == View.VISIBLE) {
 
-                    changeColorListener.onColorChanged(convertColorIntToColor(color))
+                    changeColorListener.onColorChanged(convertColorIntToColor(color) ?: Color.GRAY)
 
                     for (i in 0 until customColorPickerItems.size) {
                         customColorPickerItems[i].setChecked(false)
