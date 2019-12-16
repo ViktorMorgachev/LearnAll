@@ -1,5 +1,6 @@
 package com.sedi.viktor.learnAll.data
 
+import com.sedi.viktor.learnAll.data.models.CardState
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 
@@ -20,7 +21,22 @@ class DatabaseConverter {
         }
 
         fun convertRoomModelToWordItem(wordItemRoomModel: WordItemRoomModel): WordItem? {
-            return null
+
+            return WordItem(
+                wordItemRoomModel.learned,
+                wordItemRoomModel.otherName, wordItemRoomModel.nativeName, false,
+                CardState(
+                    wordItemRoomModel.cardNativeBackGround,
+                    "",
+                    wordItemRoomModel.cardNativeTextColor
+                ),
+                CardState(
+                    wordItemRoomModel.cardOtherBackGround,
+                    "",
+                    wordItemRoomModel.cardOtheTextColor
+                )
+            )
+
         }
     }
 
