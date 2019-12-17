@@ -22,4 +22,7 @@
     <string name="empty_list">Список пустой</string>
     <string name="change">Изменить</string>
     <string name="delete">Удалить</string>
+    <string name="add_сard">Добавить</string>
+    <string name="cards">Все карты</string>
+    <string name="learn">Учить</string>
 </resources>
