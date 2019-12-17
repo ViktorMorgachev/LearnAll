@@ -3,6 +3,7 @@ package com.sedi.viktor.learnAll.custom
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.extensions.gone
@@ -32,5 +33,9 @@ class CustomToolbar(context: Context, attributeSet: AttributeSet) :
     fun onActionClick(action: (() -> Unit) = {}) {
         iv_menu_options.visible()
         iv_menu_options.setOnClickListener { action() }
+    }
+
+    fun getMenuItem(): ImageView {
+        return iv_menu_options
     }
 }

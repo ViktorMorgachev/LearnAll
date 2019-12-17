@@ -25,4 +25,5 @@
     <string name="add_сard">Добавить</string>
     <string name="cards">Все карты</string>
     <string name="learn">Учить</string>
+    <string name="add_at_least_word">Добавьте хотя-бы одно слово</string>
 </resources>

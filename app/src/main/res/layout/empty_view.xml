@@ -23,7 +23,7 @@
         android:id="@+id/tv_developer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/empty_list"
+        android:text="@string/add_at_least_word"
         android:textSize="15sp"
         android:textStyle="italic"
         app:layout_constraintLeft_toLeftOf="parent"

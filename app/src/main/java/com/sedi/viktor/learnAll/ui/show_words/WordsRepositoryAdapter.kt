@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.sedi.viktor.learnAll.databinding.ItemWordBinding
 import com.sedi.viktor.learnAll.data.models.WordItem
+import com.sedi.viktor.learnAll.databinding.ItemWordBinding
 
 class WordsRepositoryAdapter(private val items: List<WordItem>) :
     RecyclerView.Adapter<WordsRepositoryAdapter.WordsHolder>() {
@@ -25,7 +25,7 @@ class WordsRepositoryAdapter(private val items: List<WordItem>) :
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: WordsHolder, position: Int) {
-        holder.binding!!.word = items[position]
+        holder.binding!!.card = items[position]
     }
 
     inner class WordsHolder : RecyclerView.ViewHolder {

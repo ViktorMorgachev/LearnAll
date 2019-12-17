@@ -233,7 +233,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
                 toast("На главную")
             }
             onBackClick {
-                toast("Назад")
+                onBackPressed()
             }
         }
 
