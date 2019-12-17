@@ -1,20 +1,21 @@
 package com.sedi.viktor.learnAll.ui.show_words
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.data.WordItemDatabase
+import com.sedi.viktor.learnAll.data.models.CardState
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 import com.sedi.viktor.learnAll.extensions.invisible
 import com.sedi.viktor.learnAll.extensions.visible
+import com.sedi.viktor.learnAll.ui.BaseActivity
 import com.sedi.viktor.learnAll.ui.dialogs.MessageBox
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.words_activity.*
 
-class ShowWordsActivity : AppCompatActivity() {
+class ShowWordsActivity : BaseActivity() {
 
 
     private lateinit var items: ArrayList<WordItem>
@@ -59,7 +60,6 @@ class ShowWordsActivity : AppCompatActivity() {
             }
         }
 
-        recycler_view.adapter = WordsRepositoryAdapter(items)
 
         val gridLayoutManager = GridLayoutManager(this, 2, RecyclerView.VERTICAL, false)
         recycler_view.layoutManager = gridLayoutManager
@@ -68,13 +68,29 @@ class ShowWordsActivity : AppCompatActivity() {
 
     private fun cardsConvert(cards: ArrayList<WordItemRoomModel>) {
 
-        // TODO бегаем по всему списку и конветируем данные
+        val newCards = ArrayList<WordItem>()
+
+        for (wordItem in cards) {
+            newCards.add(
+                WordItem(
+                    wordItem.learned,
+                    wordItem.otherName,
+                    wordItem.nativeName, false,
+                    CardState(wordItem.cardNativeBackGround, wordItem.cardNativeTextColor),
+                    CardState(wordItem.cardOtherBackGround, wordItem.cardOtheTextColor)
+                )
+            )
+        }
+
         // После обновляем список
         runOnUiThread {
 
             if (cards.size == 0) {
                 parent_empty_view.visible()
-            } else parent_empty_view.invisible()
+            } else {
+                recycler_view.adapter = WordsRepositoryAdapter(newCards)
+                parent_empty_view.invisible()
+            }
 
         }
 
@@ -83,9 +99,11 @@ class ShowWordsActivity : AppCompatActivity() {
     private fun setupViews() {
         appToolBar.apply {
             setTitle("Все слова")
-            hideBackButton()
+            onBackClick {
+                toast("На главную")
+            }
             onActionClick {
-
+                toast("Назад")
             }
         }
     }

@@ -230,7 +230,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             setTitle("Редактор карточки")
             showBackButton()
             onActionClick {
-                toast("Действие")
+                toast("На главную")
             }
             onBackClick {
                 toast("Назад")
@@ -441,7 +441,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             when (it.itemId) {
                 R.id.menu_edit_card_color -> showChangeColorDialog(ModifyingItem.CARD)
                 R.id.menu_edit_text_color -> showChangeColorDialog(ModifyingItem.TEXT)
-                R.id.menu_edit_text_font -> showEditFontdialog()
                 else -> false
             }
         }
@@ -449,12 +448,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     }
 
-    private fun showEditFontdialog(): Boolean {
-
-        alertDialog = AlertDialog.Builder(this).create()
-
-        return false
-    }
 
     private fun showChangeColorDialog(modifyingItem: ModifyingItem): Boolean {
 

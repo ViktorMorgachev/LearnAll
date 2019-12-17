@@ -27,12 +27,10 @@ class DatabaseConverter {
                 wordItemRoomModel.otherName, wordItemRoomModel.nativeName, false,
                 CardState(
                     wordItemRoomModel.cardNativeBackGround,
-                    "",
                     wordItemRoomModel.cardNativeTextColor
                 ),
                 CardState(
                     wordItemRoomModel.cardOtherBackGround,
-                    "",
                     wordItemRoomModel.cardOtheTextColor
                 )
             )

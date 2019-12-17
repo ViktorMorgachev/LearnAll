@@ -3,8 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="Card"
+            type="com.sedi.viktor.learnAll.data.models.WordItem" />
+    </data>
+
     <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,6 +47,7 @@
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="10dp"
+                android:text="@{Card.nativeName}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -53,6 +61,7 @@
                 android:layout_marginTop="5dp"
                 android:gravity="center"
                 android:minWidth="70dp"
+                android:text="@{Card.otherName}"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@id/tv_native_name"
