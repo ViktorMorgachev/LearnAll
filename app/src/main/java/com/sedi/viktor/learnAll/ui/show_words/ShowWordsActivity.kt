@@ -24,16 +24,16 @@ import kotlinx.android.synthetic.main.words_activity.*
 class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback {
 
     // Callbacks
-    override fun onMenu(view: ImageView) {
+    override fun onMenu(view: View) {
         toast("Меню")
     }
 
     override fun onDelete(wordItem: WordItem) {
-        toast("Удалить")
+        toast("Удалить ${wordItem.nativeName}")
     }
 
     override fun onEdit(wordItem: WordItem) {
-        toast("Изменить")
+        toast("Изменить ${wordItem.nativeName}")
     }
 
 
@@ -52,6 +52,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
 
         setContentView(R.layout.words_activity)
         setupViews()
+
 
 
         if (getWordsRunnable == null) {
@@ -78,6 +79,9 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
             }
         }
 
+        // TODO тут нужно анимацию предразгрузки слов с БД
+        Thread(getWordsRunnable).start()
+
 
         val gridLayoutManager = GridLayoutManager(this, 3, RecyclerView.VERTICAL, false)
         recycler_view.layoutManager = gridLayoutManager
@@ -98,6 +102,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
                 )
             )
         }
+
 
         // После обновляем список
         runOnUiThread {
@@ -158,8 +163,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
     override fun onResume() {
         super.onResume()
         parent_empty_view.gone()
-        // TODO тут нужно анимацию предразгрузки слов с БД
-        Thread(getWordsRunnable).start()
+
 
     }
 }
