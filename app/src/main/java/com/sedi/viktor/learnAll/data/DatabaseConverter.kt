@@ -16,6 +16,7 @@ class DatabaseConverter {
                 cardNativeTextColor = wordItem.cardStateNative.textColor
                 cardOtheTextColor = wordItem.cardStateOther.textColor
                 cardOtherBackGround = wordItem.cardStateOther.backColor
+                favourite = wordItem.favourite
             }
             return wordItemRoomModel
         }
@@ -24,7 +25,9 @@ class DatabaseConverter {
 
             return WordItem(
                 wordItemRoomModel.learned,
-                wordItemRoomModel.otherName, wordItemRoomModel.nativeName, false,
+                wordItemRoomModel.otherName,
+                wordItemRoomModel.nativeName,
+                wordItemRoomModel.favourite,
                 CardState(
                     wordItemRoomModel.cardNativeBackGround,
                     wordItemRoomModel.cardNativeTextColor

@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="Handler"
+            type="com.sedi.viktor.learnAll.ui.show_words.WordsRepositoryAdapter.ClickHandler" />
+
+        <variable
             name="Card"
             type="com.sedi.viktor.learnAll.data.models.WordItem" />
     </data>
@@ -24,8 +28,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
+                android:onClick="@{(view) -> Card.favourite ?  Handler.onNonFafourite(view) : Handler.onFavourite(view)}"
                 android:scaleType="center"
-                android:src="@drawable/ic_favorite_border"
+                android:src="@{Card.favourite ? drawable/ic_favorite : drawable/ic_favorite_color}"
                 app:layout_constraintBottom_toTopOf="@id/tv_other_name"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/tv_other_name"
@@ -35,6 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
+                android:onClick="@{Handler.onMenu()}"
                 android:src="@drawable/ic_more"
                 app:layout_constraintBottom_toTopOf="@id/tv_other_name"
                 app:layout_constraintLeft_toRightOf="@id/tv_other_name"
@@ -55,7 +61,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_other_name"
-                tools:text="Девоsdsdfsdfsdfsfdчка" />
+                tools:text="Девочка" />
 
             <TextView
                 android:id="@+id/tv_other_name"

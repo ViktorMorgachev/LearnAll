@@ -3,6 +3,7 @@ package com.sedi.viktor.learnAll.ui.show_words
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +21,20 @@ import com.sedi.viktor.learnAll.ui.edit_word.EditWordActivity
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.words_activity.*
 
-class ShowWordsActivity : BaseActivity() {
+class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback {
+
+    // Callbacks
+    override fun onMenu(view: ImageView) {
+        toast("Меню")
+    }
+
+    override fun onDelete(wordItem: WordItem) {
+        toast("Удалить")
+    }
+
+    override fun onEdit(wordItem: WordItem) {
+        toast("Изменить")
+    }
 
 
     private var db: WordItemDatabase? = null
@@ -73,7 +87,6 @@ class ShowWordsActivity : BaseActivity() {
     private fun cardsConvert(card_items: ArrayList<WordItemRoomModel>) {
 
 
-
         for (wordItem in card_items) {
             cards.add(
                 WordItem(
@@ -92,7 +105,7 @@ class ShowWordsActivity : BaseActivity() {
             if (cards.size == 0) {
                 parent_empty_view.visible()
             } else {
-                recycler_view.adapter = WordsRepositoryAdapter(cards)
+                recycler_view.adapter = WordsRepositoryAdapter(cards, this)
                 parent_empty_view.invisible()
             }
 
@@ -114,7 +127,10 @@ class ShowWordsActivity : BaseActivity() {
 
     }
 
+    // TODO изменение реализации, передавать уже готовое меню
     private fun showPopupMenu(targetView: View) {
+
+
         val popupMenu = PopupMenu(this, targetView)
         popupMenu.inflate(R.menu.popup_main_menu_card)
 

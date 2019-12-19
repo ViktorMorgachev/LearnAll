@@ -35,6 +35,7 @@ open class BaseActivity : AppCompatActivity() {
             it.stop()
             it.shutdown()
         }
-
     }
+
+
 }
