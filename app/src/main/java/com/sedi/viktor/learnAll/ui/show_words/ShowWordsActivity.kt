@@ -3,13 +3,12 @@ package com.sedi.viktor.learnAll.ui.show_words
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sedi.viktor.learnAll.R
+import com.sedi.viktor.learnAll.data.DatabaseConverter
 import com.sedi.viktor.learnAll.data.WordItemDatabase
-import com.sedi.viktor.learnAll.data.models.CardState
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 import com.sedi.viktor.learnAll.extensions.gone
@@ -24,22 +23,18 @@ import kotlinx.android.synthetic.main.words_activity.*
 class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback {
 
     // Callbacks
-    override fun onMenu(view: View) {
-        toast("Меню")
-    }
-
-    override fun onDelete(wordItem: WordItem) {
-        toast("Удалить ${wordItem.nativeName}")
-    }
-
-    override fun onEdit(wordItem: WordItem) {
-        toast("Изменить ${wordItem.nativeName}")
+    override fun onMenu(view: View, wordItem: WordItem) {
+        this.selectedWordItem = wordItem
+        showPopupMenu(getPopupMenCard(view))
     }
 
 
     private var db: WordItemDatabase? = null
+    private lateinit var popupMenuListener: PopupMenu.OnMenuItemClickListener
+    private var selectedWordItem: WordItem? = null
 
     companion object {
+        private var deleteWordRunnable: Runnable? = null
         private var getWordsRunnable: Runnable? = null
         private var cards: ArrayList<WordItem> = ArrayList()
     }
@@ -52,13 +47,28 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
 
         setContentView(R.layout.words_activity)
         setupViews()
+        initListeners()
+        initRunnables()
 
+        getWords()
 
+        val gridLayoutManager = GridLayoutManager(this, 3, RecyclerView.VERTICAL, false)
+        recycler_view.layoutManager = gridLayoutManager
+    }
+
+    private fun getWords() {
+        Thread(getWordsRunnable).start()
+    }
+
+    private fun initRunnables() {
 
         if (getWordsRunnable == null) {
             getWordsRunnable = Runnable {
                 Thread.currentThread().name = "Database Thread"
                 try {
+
+                    cards.clear()
+
                     cardsConvert(
                         db!!.wordItemDao()
                             .getAll() as ArrayList<WordItemRoomModel>
@@ -79,31 +89,95 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
             }
         }
 
-        // TODO тут нужно анимацию предразгрузки слов с БД
-        Thread(getWordsRunnable).start()
+        if (deleteWordRunnable == null) {
+            deleteWordRunnable = Runnable {
+                Thread.currentThread().name = "Database Thread"
+                try {
+
+                    if (selectedWordItem != null) {
+                        db!!.wordItemDao().delete(
+                            DatabaseConverter.convertWordItemToRoomModel(
+                                selectedWordItem!!
+                            )
+                        )
+                        clearCard()
+                        runOnUiThread {
+                            toast("Успешно удалено")
+                            getWords()
+                        }
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        MessageBox.show(
+                            this,
+                            "Ошибка удаления",
+                            e.message ?: "Обратитесь к разработчику", this
+                        )
+                    }
+                    clearCard()
+
+                }
+
+            }
+        }
 
 
-        val gridLayoutManager = GridLayoutManager(this, 3, RecyclerView.VERTICAL, false)
-        recycler_view.layoutManager = gridLayoutManager
+    }
+
+    private fun initListeners() {
+        popupMenuListener = PopupMenu.OnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.menu_learn -> {
+                    toast("Учить")
+                    true
+                }
+                R.id.menu_all_cards -> {
+                    toast("Обновить")
+                    true
+                }
+                R.id.menu_add_card -> {
+                    startActivity(Intent(this, EditWordActivity::class.java))
+                    true
+                }
+                R.id.menu_delete_card -> {
+                    deleteCard()
+                    true
+                }
+                R.id.menu_change_card -> {
+                    editCard()
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    private fun editCard() {
+
+        // Запускаем активность c передачей ей карточки
+        clearCard()
+
+    }
+
+    private fun deleteCard() {
+        Thread(deleteWordRunnable).start()
+    }
+
+    private fun getPopupMenCard(targetView: View): PopupMenu {
+        val popupMenu = PopupMenu(this, targetView)
+        popupMenu.inflate(R.menu.popup_edit_menu_card)
+        return popupMenu
     }
 
 
     private fun cardsConvert(card_items: ArrayList<WordItemRoomModel>) {
 
-
         for (wordItem in card_items) {
             cards.add(
-                WordItem(
-                    wordItem.learned,
-                    wordItem.otherName,
-                    wordItem.nativeName, false,
-                    CardState(wordItem.cardNativeBackGround, wordItem.cardNativeTextColor),
-                    CardState(wordItem.cardOtherBackGround, wordItem.cardOtheTextColor)
-                )
+                DatabaseConverter.convertRoomModelToWordItem(wordItem)
             )
         }
-
-
         // После обновляем список
         runOnUiThread {
 
@@ -125,45 +199,25 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
                 toast("На главную")
             }
             onActionClick {
-                showPopupMenu(appToolBar.getMenuItem())
+                val popupMenu = PopupMenu(context, getMenuItem())
+                popupMenu.inflate(R.menu.popup_main_menu_card)
+                showPopupMenu(popupMenu)
             }
         }
-
-
     }
 
-    // TODO изменение реализации, передавать уже готовое меню
-    private fun showPopupMenu(targetView: View) {
 
-
-        val popupMenu = PopupMenu(this, targetView)
-        popupMenu.inflate(R.menu.popup_main_menu_card)
-
-        popupMenu.setOnMenuItemClickListener {
-
-            when (it.itemId) {
-                R.id.menu_learn -> {
-                    toast("Учить")
-                    true
-                }
-                R.id.menu_all_cards -> {
-                    toast("Обновить")
-                    true
-                }
-                R.id.menu_add_card -> {
-                    startActivity(Intent(this, EditWordActivity::class.java))
-                    true
-                }
-                else -> false
-            }
-        }
+    private fun showPopupMenu(popupMenu: PopupMenu) {
+        popupMenu.setOnMenuItemClickListener(popupMenuListener)
         popupMenu.show()
+    }
+
+    private fun clearCard() {
+        selectedWordItem = null
     }
 
     override fun onResume() {
         super.onResume()
         parent_empty_view.gone()
-
-
     }
 }

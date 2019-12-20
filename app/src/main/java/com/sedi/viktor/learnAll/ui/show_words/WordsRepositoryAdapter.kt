@@ -47,46 +47,36 @@ class WordsRepositoryAdapter(
         var binding: ItemWordBinding?
     }
 
-    public inner class ClickHandler {
-      public  fun onFavourite(view: View, wordItem: WordItem) {
+     inner class ClickHandler {
+         fun onFavourite(view: View, wordItem: WordItem) {
             (view as ImageView).setImageDrawable(
                 view.resources.getDrawable(
                     R.drawable.ic_favorite,
                     view.context.theme
                 )
             )
-          wordItem.favourite = true
+            wordItem.favourite = true
         }
 
-      public  fun onNonFafourite(view: View, wordItem: WordItem) {
+         fun onNonFafourite(view: View, wordItem: WordItem) {
             (view as ImageView).setImageDrawable(
                 view.resources.getDrawable(
                     R.drawable.ic_favorite_border,
                     view.context.theme
                 )
             )
-          wordItem.favourite = false
+            wordItem.favourite = false
         }
 
-      fun onDelete(wordItem: WordItem) {
-            clickCallback.onDelete(wordItem)
-        }
-
-      public  fun onEdit(wordItem: WordItem) {
-            clickCallback.onEdit(wordItem)
-        }
-
-        fun onMenu(view: View) {
-            clickCallback.onMenu(view)
+        fun onMenu(view: View, wordItem: WordItem) {
+            clickCallback.onMenu(view, wordItem)
         }
 
     }
 
 
-    public interface onClickCallback {
-      public  fun onDelete(wordItem: WordItem)
-        fun onEdit(wordItem: WordItem)
-        fun onMenu(view: View)
+     interface onClickCallback {
+        fun onMenu(view: View, wordItem: WordItem)
     }
 
 

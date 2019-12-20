@@ -185,6 +185,8 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             saveWordRunnable = Runnable {
                 Thread.currentThread().name = "Database Thread"
                 try {
+                    // TODO нужна проверка если такая карта существует то просто обновить иначе вставить
+
                     db!!.wordItemDao()
                         .insert(DatabaseConverter.convertWordItemToRoomModel(wordItem))
                     runOnUiThread {

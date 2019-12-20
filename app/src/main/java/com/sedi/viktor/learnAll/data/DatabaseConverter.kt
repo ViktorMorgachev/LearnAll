@@ -21,7 +21,7 @@ class DatabaseConverter {
             return wordItemRoomModel
         }
 
-        fun convertRoomModelToWordItem(wordItemRoomModel: WordItemRoomModel): WordItem? {
+        fun convertRoomModelToWordItem(wordItemRoomModel: WordItemRoomModel): WordItem {
 
             return WordItem(
                 wordItemRoomModel.learned,
