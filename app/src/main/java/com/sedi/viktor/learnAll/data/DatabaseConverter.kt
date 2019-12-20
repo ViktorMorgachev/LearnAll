@@ -9,6 +9,7 @@ class DatabaseConverter {
     companion object {
         fun convertWordItemToRoomModel(wordItem: WordItem): WordItemRoomModel {
             val wordItemRoomModel = WordItemRoomModel().apply {
+                primaryKey = wordItem.primaryKey
                 learned = wordItem.learned
                 nativeName = wordItem.nativeName
                 otherName = wordItem.otherName
@@ -24,6 +25,7 @@ class DatabaseConverter {
         fun convertRoomModelToWordItem(wordItemRoomModel: WordItemRoomModel): WordItem {
 
             return WordItem(
+                wordItemRoomModel.primaryKey,
                 wordItemRoomModel.learned,
                 wordItemRoomModel.otherName,
                 wordItemRoomModel.nativeName,

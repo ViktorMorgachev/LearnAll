@@ -22,7 +22,13 @@ import kotlinx.android.synthetic.main.words_activity.*
 
 class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback {
 
+
     // Callbacks
+    override fun onChangeFavorite(wordItem: WordItem) {
+        this.selectedWordItem = wordItem
+        Thread(updateCardRunnable).start()
+    }
+
     override fun onMenu(view: View, wordItem: WordItem) {
         this.selectedWordItem = wordItem
         showPopupMenu(getPopupMenCard(view))
@@ -34,6 +40,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
     private var selectedWordItem: WordItem? = null
 
     companion object {
+        private var updateCardRunnable: Runnable? = null
         private var deleteWordRunnable: Runnable? = null
         private var getWordsRunnable: Runnable? = null
         private var cards: ArrayList<WordItem> = ArrayList()
@@ -49,7 +56,6 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
         setupViews()
         initListeners()
         initRunnables()
-
         getWords()
 
         val gridLayoutManager = GridLayoutManager(this, 3, RecyclerView.VERTICAL, false)
@@ -57,6 +63,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
     }
 
     private fun getWords() {
+        cards.clear()
         Thread(getWordsRunnable).start()
     }
 
@@ -66,15 +73,10 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
             getWordsRunnable = Runnable {
                 Thread.currentThread().name = "Database Thread"
                 try {
-
-                    cards.clear()
-
                     cardsConvert(
                         db!!.wordItemDao()
                             .getAll() as ArrayList<WordItemRoomModel>
                     )
-
-
                 } catch (e: Exception) {
                     runOnUiThread {
                         MessageBox.show(
@@ -111,6 +113,37 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
                         MessageBox.show(
                             this,
                             "Ошибка удаления",
+                            e.message ?: "Обратитесь к разработчику", this
+                        )
+                    }
+                    clearCard()
+
+                }
+
+            }
+        }
+
+        if (updateCardRunnable == null) {
+            updateCardRunnable = Runnable {
+                Thread.currentThread().name = "Database Thread"
+                try {
+
+                    if (selectedWordItem != null) {
+                        db!!.wordItemDao().update(
+                            DatabaseConverter.convertWordItemToRoomModel(
+                                selectedWordItem!!
+                            )
+                        )
+                        clearCard()
+                        runOnUiThread {
+                            getWords()
+                        }
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        MessageBox.show(
+                            this,
+                            "Ошибка обновления",
                             e.message ?: "Обратитесь к разработчику", this
                         )
                     }

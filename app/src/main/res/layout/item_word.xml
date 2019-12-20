@@ -30,7 +30,7 @@
                 android:layout_margin="3dp"
                 android:onClick="@{ (view) -> Card.favourite ? Handler.onNonFafourite(view, Card) : Handler.onFavourite(view, Card)}"
                 android:scaleType="center"
-                android:src="@drawable/ic_favorite_border"
+                android:src="@{Card.favourite ? @drawable/ic_favorite_border : @drawable/ic_favorite}"
                 app:layout_constraintBottom_toTopOf="@id/tv_other_name"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/tv_other_name"

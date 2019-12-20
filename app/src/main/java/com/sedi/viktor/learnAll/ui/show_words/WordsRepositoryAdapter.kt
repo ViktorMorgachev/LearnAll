@@ -47,8 +47,8 @@ class WordsRepositoryAdapter(
         var binding: ItemWordBinding?
     }
 
-     inner class ClickHandler {
-         fun onFavourite(view: View, wordItem: WordItem) {
+    inner class ClickHandler {
+        fun onFavourite(view: View, wordItem: WordItem) {
             (view as ImageView).setImageDrawable(
                 view.resources.getDrawable(
                     R.drawable.ic_favorite,
@@ -56,9 +56,10 @@ class WordsRepositoryAdapter(
                 )
             )
             wordItem.favourite = true
+            clickCallback.onChangeFavorite(wordItem)
         }
 
-         fun onNonFafourite(view: View, wordItem: WordItem) {
+        fun onNonFafourite(view: View, wordItem: WordItem) {
             (view as ImageView).setImageDrawable(
                 view.resources.getDrawable(
                     R.drawable.ic_favorite_border,
@@ -66,6 +67,7 @@ class WordsRepositoryAdapter(
                 )
             )
             wordItem.favourite = false
+            clickCallback.onChangeFavorite(wordItem)
         }
 
         fun onMenu(view: View, wordItem: WordItem) {
@@ -75,8 +77,9 @@ class WordsRepositoryAdapter(
     }
 
 
-     interface onClickCallback {
+    interface onClickCallback {
         fun onMenu(view: View, wordItem: WordItem)
+        fun onChangeFavorite(wordItem: WordItem)
     }
 
 

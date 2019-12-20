@@ -25,6 +25,6 @@ abstract class WordItemDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context, WordItemDatabase::class.java, DB_NAME).build()
-
     }
+
 }

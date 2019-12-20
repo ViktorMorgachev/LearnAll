@@ -2,6 +2,7 @@ package com.sedi.viktor.learnAll.data.models
 
 
 class WordItem(
+    var primaryKey : Int = 0,
     var learned: Boolean = false,
     var otherName: String = "",
     var nativeName: String = "",
@@ -9,5 +10,5 @@ class WordItem(
     var cardStateNative: CardState = CardState(),
     var cardStateOther: CardState = CardState()
 ) {
-    constructor() : this(false, "", "", false, CardState(), CardState())
+    constructor() : this(0, false, "", "", false, CardState(), CardState())
 }

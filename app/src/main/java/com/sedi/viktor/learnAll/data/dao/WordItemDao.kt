@@ -1,9 +1,6 @@
 package com.sedi.viktor.learnAll.data.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 
@@ -24,5 +21,8 @@ interface WordItemDao {
 
     @Query("SELECT * FROM worditemroommodel WHERE learned = 'false' ")
     fun getUnlearned(): List<WordItemRoomModel>
+
+    @Update
+    fun update(wordItem: WordItemRoomModel)
 
 }
