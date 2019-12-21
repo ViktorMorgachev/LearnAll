@@ -2,11 +2,9 @@ package com.sedi.viktor.learnAll.ui.edit_word
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
@@ -23,10 +21,12 @@ import androidx.lifecycle.LifecycleOwner
 import com.sedi.viktor.learnAll.Color
 import com.sedi.viktor.learnAll.R
 import com.sedi.viktor.learnAll.convertColorStringToInt
-import com.sedi.viktor.learnAll.data.DatabaseConverter
+import com.sedi.viktor.learnAll.data.DatabaseHelper
 import com.sedi.viktor.learnAll.data.WordItemDatabase
+import com.sedi.viktor.learnAll.data.interfaces.IActionCard
 import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.WordItem
+import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
 import com.sedi.viktor.learnAll.ui.BaseActivity
 import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
@@ -43,67 +43,14 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     ChangeColorListener, ChangeStyleListener {
 
 
-    companion object {
-        private const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
-        private const val REQ_CODE_SPEECH_INPUT = 5
-        private var wordItem = WordItem()
-
-        private var saveWordRunnable: Runnable? = null
-        private val handler = Handler()
-    }
-
-
-    private var modifyingCard = ModifyingCard.NONE
-    private var modifyingItem = ModifyingItem.NONE
-    private var direction = Direction.DEFAULT
-    private var db: WordItemDatabase? = null
-    private lateinit var alertDialog: AlertDialog
-    private lateinit var yandexTranslater: YandexTranslater
-
-
     // Ovveride and callbacks
     override fun onColorChanged(color: Color) {
-
 
         when (modifyingCard) {
             ModifyingCard.NATIVE_CARD -> changeNativeColor(color)
             ModifyingCard.OTHER_CARD -> changeOtherColor(color)
             else -> TODO()
         }
-
-
-    }
-
-    private fun changeOtherColor(color: Color?) {
-
-        when (modifyingItem) {
-            ModifyingItem.CARD -> {
-                iv_word_other.setBackgroundColor(getColor(color!!.color))
-                wordItem.cardStateOther.backColor = color.name
-            }
-            ModifyingItem.TEXT -> {
-                tv_card_other.setTextColor(getColor(color!!.color))
-                wordItem.cardStateOther.textColor = color.name
-            }
-            ModifyingItem.NONE -> TODO()
-        }
-
-
-    }
-
-    private fun changeNativeColor(color: Color?) {
-
-        when (modifyingItem) {
-            ModifyingItem.CARD -> {
-                iv_word_native.setBackgroundColor(getColor(color!!.color))
-                wordItem.cardStateNative.backColor = color.name
-            }
-            ModifyingItem.TEXT -> {
-                tv_card_native.setTextColor(getColor(color!!.color))
-                wordItem.cardStateNative.textColor = color.name
-            }
-        }
-
 
     }
 
@@ -148,6 +95,71 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     }
 
 
+    object Starter {
+        fun start(activity: BaseActivity) {
+            val intent = Intent(activity, EditWordActivity::class.java)
+            activity.startActivity(intent)
+        }
+
+        fun start(activity: BaseActivity, data: WordItem) {
+            val intent = Intent(activity, EditWordActivity::class.java)
+            wordItem = data
+            activity.startActivity(intent)
+        }
+    }
+
+
+    companion object {
+        private const val RC_HANDLE_RECORD_AUDIO_PERMISSION = 4
+        private const val REQ_CODE_SPEECH_INPUT = 5
+        private var wordItem = WordItem()
+        private lateinit var nativeTextChangeListener: TextWatcher
+        private lateinit var otherTextChangeListener: TextWatcher
+    }
+
+
+    private var modifyingCard = ModifyingCard.NONE
+    private var modifyingItem = ModifyingItem.NONE
+    private var direction = Direction.DEFAULT
+    private var db: WordItemDatabase? = null
+    private var key: Int = -1
+    private lateinit var yandexTranslater: YandexTranslater
+
+
+    private fun changeOtherColor(color: Color?) {
+
+        when (modifyingItem) {
+            ModifyingItem.CARD -> {
+                iv_word_other.setBackgroundColor(getColor(color!!.color))
+                wordItem.cardStateOther.backColor = color.name
+            }
+            ModifyingItem.TEXT -> {
+                tv_card_other.setTextColor(getColor(color!!.color))
+                wordItem.cardStateOther.textColor = color.name
+            }
+            ModifyingItem.NONE -> TODO()
+        }
+
+
+    }
+
+    private fun changeNativeColor(color: Color?) {
+
+        when (modifyingItem) {
+            ModifyingItem.CARD -> {
+                iv_word_native.setBackgroundColor(getColor(color!!.color))
+                wordItem.cardStateNative.backColor = color.name
+            }
+            ModifyingItem.TEXT -> {
+                tv_card_native.setTextColor(getColor(color!!.color))
+                wordItem.cardStateNative.textColor = color.name
+            }
+        }
+
+
+    }
+
+
     private fun initNative(response: String) {
 
         wordItem.nativeName = response
@@ -175,56 +187,22 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
         setContentView(R.layout.word_edit_layout_activity)
 
         db = WordItemDatabase.invoke(this)
-
-        if (saveWordRunnable == null) {
-            saveWordRunnable = Runnable {
-                Thread.currentThread().name = "Database Thread"
-                try {
-                    // TODO нужна проверка если такая карта существует то просто обновить иначе вставить
-
-                    db!!.wordItemDao()
-                        .insert(DatabaseConverter.convertWordItemToRoomModel(wordItem))
-                    runOnUiThread {
-                        toast("Успешно сохранено", Toast.LENGTH_LONG)
-                        resetState()
-                    }
-
-                } catch (e: Exception) {
-                    runOnUiThread {
-                        MessageBox.show(
-                            this,
-                            "Ошибка добавления",
-                            e.message ?: "Обратитесь к разработчику", this
-                        )
-                    }
-
-                }
-
-            }
-        }
 
         if (textToSpeech == null)
             initTTS()
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
-
-
-        setupViews()
-
-        iv_word_native.post { iv_edit_native.setBackgroundColor(Color.DEFAULT.color) }
-        iv_word_other.post { iv_edit_other.setBackgroundColor(Color.DEFAULT.color) }
-
         initViewListeners()
-
+        initView()
+        setupViews()
         yandexTranslater = YandexTranslater(this)
 
     }
+
 
     private fun setupViews() {
 
@@ -244,12 +222,14 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     private fun initViewListeners() {
 
-        et_word_other.addTextChangedListener(object : TextWatcher {
+
+        otherTextChangeListener = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 iv_translate_other.isEnabled = !TextUtils.isEmpty(et_word_other.text)
-                if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(et_word_other.text)) {
 
-                    wordItem.otherName = tv_card_other.text.toString()
+                wordItem.otherName = tv_card_other.text.toString()
+
+                if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(et_word_other.text)) {
 
                     translateOther()
                 }
@@ -261,17 +241,19 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
-        })
+        }
 
-        et_word_native.addTextChangedListener(object : TextWatcher {
+        nativeTextChangeListener = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 iv_translate_native.isEnabled = !TextUtils.isEmpty(et_word_native.text)
-                if (direction == Direction.SPEAK_NATIVE && !TextUtils.isEmpty(tv_card_native.text)) {
 
-                    wordItem.nativeName = tv_card_native.text.toString()
+                wordItem.nativeName = tv_card_native.text.toString()
+
+                if (direction == Direction.SPEAK_NATIVE && !TextUtils.isEmpty(tv_card_native.text)) {
 
                     translateNative()
                 }
+
 
             }
 
@@ -280,7 +262,12 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
-        })
+        }
+
+
+
+        et_word_other.addTextChangedListener(otherTextChangeListener)
+        et_word_native.addTextChangedListener(nativeTextChangeListener)
 
 
     }
@@ -296,7 +283,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         iv_edit_native.isEnabled = false
         iv_edit_other.isEnabled = false
 
+
         tv_card_other.text = et_word_other.text.toString()
+        wordItem.otherName = tv_card_other.text.toString()
+
 
         direction = Direction.TRANSLATE_TO_NATIVE
 
@@ -325,6 +315,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
 
         tv_card_native.text = et_word_native.text.toString()
+        wordItem.nativeName = tv_card_native.text.toString()
 
         direction = Direction.TRANSLATE_TO_OTHER
 
@@ -404,10 +395,12 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             var text = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!![0]
             when (direction) {
                 Direction.SPEAK_NATIVE -> {
+                    wordItem.nativeName = text
                     tv_card_native.text = text
                     et_word_native.setText(text)
                 }
                 Direction.SPEAK_OTHER -> {
+                    wordItem.otherName = text
                     tv_card_other.text = text
                     et_word_other.setText(text)
                 }
@@ -434,7 +427,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     }
 
 
-    fun showPopupMenu(targetView: View) {
+    private fun showPopupMenu(targetView: View) {
         val popupMenu = PopupMenu(this, targetView)
         popupMenu.inflate(R.menu.popup_edit_card)
 
@@ -475,20 +468,56 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         return false
     }
 
-    fun SaveWord(view: View) {
-        if (TextUtils.isEmpty(et_word_other.text)) return
-        //  handler.post(saveWordRunnable)
+    public fun SaveWord(view: View) {
 
-        Thread(saveWordRunnable).start()
+
+        wordItem.otherName = et_word_other.text.toString()
+        wordItem.nativeName = et_word_native.text.toString()
+
+        if (TextUtils.isEmpty(et_word_other.text.toString()) || TextUtils.isEmpty(wordItem.nativeName) || TextUtils.isEmpty(
+                wordItem.otherName
+            )
+        ) return
+
+
+
+        DatabaseHelper.saveOrUpdateWordItem(db!!, wordItem.copy(), object : IActionCard {
+            override fun onComplete(
+                data: WordItemRoomModel?,
+                collectionData: ArrayList<WordItemRoomModel>?
+            ) {
+                runOnUiThread {
+                    toast("Успешно сохранено", Toast.LENGTH_LONG)
+                    wordItem = WordItem()
+                    initView()
+                }
+            }
+
+            override fun onError(exception: Exception) {
+                runOnUiThread {
+                    MessageBox.show(
+                        this@EditWordActivity,
+                        "Ошибка добавления",
+                        exception.message ?: "Обратитесь к разработчику", this@EditWordActivity
+                    )
+                }
+            }
+
+        })
+
 
     }
 
-    private fun resetState() {
+    private fun initView() {
 
-        wordItem = WordItem()
+
+        et_word_other.removeTextChangedListener(otherTextChangeListener)
+        et_word_native.removeTextChangedListener(nativeTextChangeListener)
+
+
 
         et_word_other.setText(wordItem.otherName)
-        tv_card_other.text = wordItem.nativeName
+        tv_card_other.text = wordItem.otherName
         et_word_native.setText(wordItem.nativeName)
         tv_card_native.text = wordItem.nativeName
         modifyingItem = ModifyingItem.NONE
@@ -497,16 +526,21 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
 
 
-        iv_edit_native.setBackgroundColor(
-            convertColorStringToInt(
-                wordItem.cardStateNative.backColor,
-                defaultColor = Color.GRAY.color
+        iv_word_native.setBackgroundColor(
+            getColor(
+                convertColorStringToInt(
+                    wordItem.cardStateNative.backColor,
+                    defaultColor = Color.GRAY.color
+                )
             )
         )
-        iv_edit_other.setBackgroundColor(
-            convertColorStringToInt(
-                wordItem.cardStateOther.backColor,
-                defaultColor = Color.GRAY.color
+
+        iv_word_other.setBackgroundColor(
+            getColor(
+                convertColorStringToInt(
+                    wordItem.cardStateOther.backColor,
+                    defaultColor = Color.GRAY.color
+                )
             )
         )
 
@@ -525,6 +559,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         )
 
 
+        et_word_other.addTextChangedListener(otherTextChangeListener)
+        et_word_native.addTextChangedListener(nativeTextChangeListener)
+
+
     }
 
     private fun onDismisedColorChoosedDialog() {
@@ -540,7 +578,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     }
 
     fun OnEditCardNative(view: View) {
-
 
         modifyingCard = ModifyingCard.NATIVE_CARD
         showPopupMenu(view)
@@ -575,5 +612,8 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         NONE
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        wordItem = WordItem()
+    }
 }

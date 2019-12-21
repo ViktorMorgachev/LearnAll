@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-class WordItemRoomModel {
+class WordItemRoomModel : Any() {
 
     @PrimaryKey(autoGenerate = true)
     var primaryKey: Int = 0

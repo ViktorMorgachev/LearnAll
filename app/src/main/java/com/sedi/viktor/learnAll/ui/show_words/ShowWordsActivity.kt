@@ -1,14 +1,14 @@
 package com.sedi.viktor.learnAll.ui.show_words
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sedi.viktor.learnAll.R
-import com.sedi.viktor.learnAll.data.DatabaseConverter
+import com.sedi.viktor.learnAll.data.DatabaseHelper
 import com.sedi.viktor.learnAll.data.WordItemDatabase
+import com.sedi.viktor.learnAll.data.interfaces.IActionCard
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 import com.sedi.viktor.learnAll.extensions.gone
@@ -22,11 +22,33 @@ import kotlinx.android.synthetic.main.words_activity.*
 
 class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback {
 
-
     // Callbacks
     override fun onChangeFavorite(wordItem: WordItem) {
         this.selectedWordItem = wordItem
-        Thread(updateCardRunnable).start()
+        DatabaseHelper.saveOrUpdateWordItem(db!!, wordItem, object : IActionCard {
+            override fun onError(exception: Exception) {
+                runOnUiThread {
+                    MessageBox.show(
+                        this@ShowWordsActivity,
+                        "Ошибка обновления",
+                        exception.message ?: "Обратитесь к разработчику", this@ShowWordsActivity
+                    )
+                }
+                clearCard()
+
+            }
+
+            override fun onComplete(
+                data: WordItemRoomModel?,
+                collectionData: ArrayList<WordItemRoomModel>?
+            ) {
+                clearCard()
+                runOnUiThread {
+                    getWords()
+                }
+            }
+
+        })
     }
 
     override fun onMenu(view: View, wordItem: WordItem) {
@@ -40,9 +62,6 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
     private var selectedWordItem: WordItem? = null
 
     companion object {
-        private var updateCardRunnable: Runnable? = null
-        private var deleteWordRunnable: Runnable? = null
-        private var getWordsRunnable: Runnable? = null
         private var cards: ArrayList<WordItem> = ArrayList()
     }
 
@@ -55,8 +74,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
         setContentView(R.layout.words_activity)
         setupViews()
         initListeners()
-        initRunnables()
-        getWords()
+
 
         val gridLayoutManager = GridLayoutManager(this, 3, RecyclerView.VERTICAL, false)
         recycler_view.layoutManager = gridLayoutManager
@@ -64,98 +82,45 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
 
     private fun getWords() {
         cards.clear()
-        Thread(getWordsRunnable).start()
-    }
 
-    private fun initRunnables() {
-
-        if (getWordsRunnable == null) {
-            getWordsRunnable = Runnable {
-                Thread.currentThread().name = "Database Thread"
+        DatabaseHelper.getWords(db!!, object : IActionCard {
+            override fun onComplete(
+                data: WordItemRoomModel?,
+                collectionData: ArrayList<WordItemRoomModel>?
+            ) {
                 try {
-                    cardsConvert(
-                        db!!.wordItemDao()
-                            .getAll() as ArrayList<WordItemRoomModel>
-                    )
+                    if (collectionData != null)
+                        cardsConvert(
+                            collectionData
+                        )
                 } catch (e: Exception) {
                     runOnUiThread {
                         MessageBox.show(
-                            this,
+                            this@ShowWordsActivity,
                             "Ошибка получения карточек",
-                            e.message ?: "Обратитесь к разработчику", this
+                            e.message ?: "Обратитесь к разработчику", this@ShowWordsActivity
                         )
                     }
 
                 }
-
             }
-        }
 
-        if (deleteWordRunnable == null) {
-            deleteWordRunnable = Runnable {
-                Thread.currentThread().name = "Database Thread"
-                try {
+            override fun onError(exception: Exception) {
 
-                    if (selectedWordItem != null) {
-                        db!!.wordItemDao().delete(
-                            DatabaseConverter.convertWordItemToRoomModel(
-                                selectedWordItem!!
-                            )
-                        )
-                        clearCard()
-                        runOnUiThread {
-                            toast("Успешно удалено")
-                            getWords()
-                        }
-                    }
-                } catch (e: Exception) {
-                    runOnUiThread {
-                        MessageBox.show(
-                            this,
-                            "Ошибка удаления",
-                            e.message ?: "Обратитесь к разработчику", this
-                        )
-                    }
-                    clearCard()
-
+                runOnUiThread {
+                    MessageBox.show(
+                        this@ShowWordsActivity,
+                        "Ошибка получения карточек",
+                        exception.message ?: "Обратитесь к разработчику", this@ShowWordsActivity
+                    )
                 }
 
             }
-        }
-
-        if (updateCardRunnable == null) {
-            updateCardRunnable = Runnable {
-                Thread.currentThread().name = "Database Thread"
-                try {
-
-                    if (selectedWordItem != null) {
-                        db!!.wordItemDao().update(
-                            DatabaseConverter.convertWordItemToRoomModel(
-                                selectedWordItem!!
-                            )
-                        )
-                        clearCard()
-                        runOnUiThread {
-                            getWords()
-                        }
-                    }
-                } catch (e: Exception) {
-                    runOnUiThread {
-                        MessageBox.show(
-                            this,
-                            "Ошибка обновления",
-                            e.message ?: "Обратитесь к разработчику", this
-                        )
-                    }
-                    clearCard()
-
-                }
-
-            }
-        }
 
 
+        })
     }
+
 
     private fun initListeners() {
         popupMenuListener = PopupMenu.OnMenuItemClickListener {
@@ -169,7 +134,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
                     true
                 }
                 R.id.menu_add_card -> {
-                    startActivity(Intent(this, EditWordActivity::class.java))
+                    EditWordActivity.Starter.start(this)
                     true
                 }
                 R.id.menu_delete_card -> {
@@ -188,13 +153,38 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
 
     private fun editCard() {
 
-        // Запускаем активность c передачей ей карточки
-        clearCard()
+        if (selectedWordItem != null)
+            EditWordActivity.Starter.start(this, selectedWordItem!!.copy())
 
     }
 
     private fun deleteCard() {
-        Thread(deleteWordRunnable).start()
+
+        if (selectedWordItem != null)
+            DatabaseHelper.deleteWordItem(db!!, selectedWordItem!!.copy(), object : IActionCard {
+                override fun onError(exception: Exception) {
+                    runOnUiThread {
+                        MessageBox.show(
+                            this@ShowWordsActivity,
+                            "Ошибка удаления",
+                            exception.message ?: "Обратитесь к разработчику", this@ShowWordsActivity
+                        )
+                    }
+                    clearCard()
+                }
+
+                override fun onComplete(
+                    data: WordItemRoomModel?,
+                    collectionData: ArrayList<WordItemRoomModel>?
+                ) {
+                    clearCard()
+                    runOnUiThread {
+                        toast("Успешно удалено")
+                        getWords()
+                    }
+                }
+            })
+
     }
 
     private fun getPopupMenCard(targetView: View): PopupMenu {
@@ -208,7 +198,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
 
         for (wordItem in card_items) {
             cards.add(
-                DatabaseConverter.convertRoomModelToWordItem(wordItem)
+                DatabaseHelper.convertRoomModelToWordItem(wordItem)
             )
         }
         // После обновляем список
@@ -218,7 +208,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
                 parent_empty_view.visible()
             } else {
                 recycler_view.adapter = WordsRepositoryAdapter(cards, this)
-                parent_empty_view.invisible()
+                parent_empty_view.gone()
             }
 
         }
@@ -251,6 +241,8 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
 
     override fun onResume() {
         super.onResume()
+        getWords()
         parent_empty_view.gone()
     }
+
 }

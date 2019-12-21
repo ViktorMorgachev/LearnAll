@@ -25,4 +25,13 @@ interface WordItemDao {
     @Update
     fun update(wordItem: WordItemRoomModel)
 
+    @Query("SELECT * FROM worditemroommodel WHERE primaryKey = :id ")
+    fun getByID(id : Int) : WordItemRoomModel?
+
+    @Query("SELECT * FROM worditemroommodel WHERE learned = 'true' ")
+    fun getAllLearned() : WordItemRoomModel?
+
+    @Query("SELECT * FROM worditemroommodel WHERE learned = 'false' ")
+    fun getNewWords() : WordItemRoomModel?
+
 }
