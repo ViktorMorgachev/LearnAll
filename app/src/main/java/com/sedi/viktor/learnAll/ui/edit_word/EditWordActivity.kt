@@ -122,7 +122,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     private var modifyingItem = ModifyingItem.NONE
     private var direction = Direction.DEFAULT
     private var db: WordItemDatabase? = null
-    private var key: Int = -1
     private lateinit var yandexTranslater: YandexTranslater
 
 
@@ -481,7 +480,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
 
 
-        DatabaseHelper.saveOrUpdateWordItem(db!!, wordItem.copy(), object : IActionCard {
+        DatabaseHelper.asynkSaveOrUpdateWordItem(db!!, wordItem.copy(), object : IActionCard {
             override fun onComplete(
                 data: WordItemRoomModel?,
                 collectionData: ArrayList<WordItemRoomModel>?

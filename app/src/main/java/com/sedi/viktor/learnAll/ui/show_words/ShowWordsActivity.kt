@@ -12,11 +12,11 @@ import com.sedi.viktor.learnAll.data.interfaces.IActionCard
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 import com.sedi.viktor.learnAll.extensions.gone
-import com.sedi.viktor.learnAll.extensions.invisible
 import com.sedi.viktor.learnAll.extensions.visible
 import com.sedi.viktor.learnAll.ui.BaseActivity
 import com.sedi.viktor.learnAll.ui.dialogs.MessageBox
 import com.sedi.viktor.learnAll.ui.edit_word.EditWordActivity
+import com.sedi.viktor.learnAll.ui.learn_words.LearnWordsActivity
 import kotlinx.android.synthetic.main.empty_view.*
 import kotlinx.android.synthetic.main.words_activity.*
 
@@ -25,7 +25,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
     // Callbacks
     override fun onChangeFavorite(wordItem: WordItem) {
         this.selectedWordItem = wordItem
-        DatabaseHelper.saveOrUpdateWordItem(db!!, wordItem, object : IActionCard {
+        DatabaseHelper.asynkSaveOrUpdateWordItem(db!!, wordItem, object : IActionCard {
             override fun onError(exception: Exception) {
                 runOnUiThread {
                     MessageBox.show(
@@ -83,7 +83,7 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
     private fun getWords() {
         cards.clear()
 
-        DatabaseHelper.getWords(db!!, object : IActionCard {
+        DatabaseHelper.asynkGetWords(db!!, object : IActionCard {
             override fun onComplete(
                 data: WordItemRoomModel?,
                 collectionData: ArrayList<WordItemRoomModel>?
@@ -126,11 +126,11 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
         popupMenuListener = PopupMenu.OnMenuItemClickListener {
             when (it.itemId) {
                 R.id.menu_learn -> {
-                    toast("Учить")
+                    LearnWordsActivity.Starter.start(this)
                     true
                 }
                 R.id.menu_all_cards -> {
-                    toast("Обновить")
+                    getWords()
                     true
                 }
                 R.id.menu_add_card -> {
@@ -161,29 +161,33 @@ class ShowWordsActivity : BaseActivity(), WordsRepositoryAdapter.onClickCallback
     private fun deleteCard() {
 
         if (selectedWordItem != null)
-            DatabaseHelper.deleteWordItem(db!!, selectedWordItem!!.copy(), object : IActionCard {
-                override fun onError(exception: Exception) {
-                    runOnUiThread {
-                        MessageBox.show(
-                            this@ShowWordsActivity,
-                            "Ошибка удаления",
-                            exception.message ?: "Обратитесь к разработчику", this@ShowWordsActivity
-                        )
+            DatabaseHelper.asynkDeleteWordItem(
+                db!!,
+                selectedWordItem!!.copy(),
+                object : IActionCard {
+                    override fun onError(exception: Exception) {
+                        runOnUiThread {
+                            MessageBox.show(
+                                this@ShowWordsActivity,
+                                "Ошибка удаления",
+                                exception.message ?: "Обратитесь к разработчику",
+                                this@ShowWordsActivity
+                            )
+                        }
+                        clearCard()
                     }
-                    clearCard()
-                }
 
-                override fun onComplete(
-                    data: WordItemRoomModel?,
-                    collectionData: ArrayList<WordItemRoomModel>?
-                ) {
-                    clearCard()
-                    runOnUiThread {
-                        toast("Успешно удалено")
-                        getWords()
+                    override fun onComplete(
+                        data: WordItemRoomModel?,
+                        collectionData: ArrayList<WordItemRoomModel>?
+                    ) {
+                        clearCard()
+                        runOnUiThread {
+                            toast("Успешно удалено")
+                            getWords()
+                        }
                     }
-                }
-            })
+                })
 
     }
 

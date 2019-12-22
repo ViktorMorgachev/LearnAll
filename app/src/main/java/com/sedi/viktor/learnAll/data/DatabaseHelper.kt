@@ -43,7 +43,7 @@ class DatabaseHelper {
 
         }
 
-        fun saveOrUpdateWordItem(
+        fun asynkSaveOrUpdateWordItem(
             db: WordItemDatabase,
             wordItem: WordItem,
             iActionCard: IActionCard
@@ -97,7 +97,7 @@ class DatabaseHelper {
         }
 
 
-        fun getWords(db: WordItemDatabase, iActionCard: IActionCard) {
+        fun asynkGetWords(db: WordItemDatabase, iActionCard: IActionCard) {
             Thread(Runnable {
 
                 Thread.currentThread().name = "Database Thread"
@@ -119,7 +119,7 @@ class DatabaseHelper {
             }).start()
         }
 
-        fun deleteWordItem(db: WordItemDatabase, wordItem: WordItem, iActionCard: IActionCard) {
+        fun asynkDeleteWordItem(db: WordItemDatabase, wordItem: WordItem, iActionCard: IActionCard) {
 
             Thread(Runnable {
 

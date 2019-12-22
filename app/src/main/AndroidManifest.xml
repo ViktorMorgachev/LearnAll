@@ -35,6 +35,7 @@
         </activity>
 
         <activity android:name=".ui.BaseActivity" />
+        <activity android:name=".ui.learn_words.LearnWordsActivity" />
 
 
         <meta-data

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <data>
+
+        <variable
+            name="Card"
+            type="com.sedi.viktor.learnAll.data.models.WordItem" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:text="@{Card.nativeName}"
+            android:layout_marginRight="10dp"
+            android:background="@color/dark_green"
+            android:gravity="center"
+            android:textSize="50sp"
+            tools:text="nemocnice" />
+
+
+    </LinearLayout>
+
+
+</layout>
+
