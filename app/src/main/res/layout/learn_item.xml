@@ -8,6 +8,10 @@
         <variable
             name="Card"
             type="com.sedi.viktor.learnAll.data.models.WordItem" />
+
+        <variable
+            name="Mode"
+            type="com.sedi.viktor.learnAll.ui.learn_words.LearnWordsActivity.Mode" />
     </data>
 
     <LinearLayout
@@ -21,10 +25,10 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
-            android:text="@{Card.nativeName}"
             android:layout_marginRight="10dp"
-            android:background="@color/dark_green"
+            android:background="@{Mode.Native ? Card.cardStateNative.backColor : Card.cardStateOther.backColor}"
             android:gravity="center"
+            android:text="@{Mode.Native ?  Card.nativeName : Card.otherName}"
             android:textSize="50sp"
             tools:text="nemocnice" />
 

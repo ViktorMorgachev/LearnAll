@@ -42,6 +42,7 @@ import java.time.format.TextStyle
 class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallbackImpl,
     ChangeColorListener, ChangeStyleListener {
 
+    // TODO перейти на биндинг
 
     // Ovveride and callbacks
     override fun onColorChanged(color: Color) {
