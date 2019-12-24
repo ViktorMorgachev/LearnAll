@@ -13,7 +13,7 @@ import com.sedi.viktor.learnAll.data.models.WordItem
 class LearnWordFragment : Fragment() {
 
     private lateinit var learnListener: LearnCallback
-    // TODO привязать это значение к биндингу
+
     private lateinit var wordItem: WordItem
 
     override fun onCreateView(
@@ -22,6 +22,7 @@ class LearnWordFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.learn_item, container, false)
+
     }
 
 

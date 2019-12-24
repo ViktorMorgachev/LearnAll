@@ -1,327 +1,340 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView
+    <data>
+
+        <variable
+            name="Card"
+            type="com.sedi.viktor.learnAll.data.models.WordItem" />
+    </data>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_gravity="center">
 
-            <com.sedi.viktor.learnAll.custom.CustomToolbar
-                android:id="@+id/appToolBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl_pictire_card"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:paddingStart="50dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:visibility="gone"
-                app:layout_constraintLeft_toRightOf="@id/cl_other_card"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-
-                <ImageView
-                    android:id="@+id/iv_picture"
-                    android:layout_width="300dp"
-                    android:layout_height="150dp"
-                    android:background="@color/cardview_dark_background"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <ImageView
-                    android:id="@+id/iv_picture_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_delete"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_picture"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <ImageView
-                    android:id="@+id/iv_picture_edit"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_edit_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_picture"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_picture" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl_native_card"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:paddingTop="20dp"
-                android:paddingRight="40dp"
-                android:paddingBottom="20dp">
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/iv_word_native"
-                    android:layout_width="0dp"
-                    android:layout_height="150dp"
-                    android:background="@color/cardview_dark_background"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/iv_word_native_edit"
-                    app:layout_constraintTop_toTopOf="parent" />
+                <com.sedi.viktor.learnAll.custom.CustomToolbar
+                    android:id="@+id/appToolBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-
-                <TextView
-                    android:id="@+id/tv_card_native"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_pictire_card"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_word_native"
-                    app:layout_constraintLeft_toLeftOf="@id/iv_word_native"
-                    app:layout_constraintRight_toRightOf="@id/iv_word_native"
-                    app:layout_constraintTop_toTopOf="@id/iv_word_native"
-                    tools:text="Доктор" />
-
-
-
-
-                <ImageView
-                    android:id="@+id/iv_word_native_edit"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:onClick="OnEditCardNative"
-                    android:src="@drawable/ic_edit_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_word_native"
-                    app:layout_constraintRight_toRightOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl_other_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:paddingTop="20dp"
-                android:paddingRight="40dp"
-                android:paddingBottom="20dp">
-
-                <ImageView
-                    android:id="@+id/iv_word_other"
-                    android:layout_width="0dp"
-                    android:layout_height="150dp"
-                    android:background="@color/cardview_dark_background"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/iv_word_other_edit"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <TextView
-                    android:id="@+id/tv_card_other"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_word_other"
-                    app:layout_constraintLeft_toLeftOf="@id/iv_word_other"
-                    app:layout_constraintRight_toRightOf="@id/iv_word_other"
-                    app:layout_constraintTop_toTopOf="@id/iv_word_other"
-                    tools:text="Doktorka" />
-
-
-                <ImageView
-                    android:id="@+id/iv_word_other_edit"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:onClick="OnEditCardOther"
-                    android:src="@drawable/ic_edit_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_word_other"
-                    app:layout_constraintRight_toRightOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:paddingTop="20dp"
-                android:paddingRight="40dp"
-                android:paddingBottom="20dp">
-
-
-                <ImageView
-                    android:id="@+id/iv_translate_other"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="OnTranslateOther"
-                    android:src="@drawable/ic_translate"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/et_word_other"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <EditText
-                    android:id="@+id/et_word_other"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:hint="@string/input_text_other"
-                    android:maxLines="1"
-                    android:orientation="horizontal"
-                    android:textAlignment="center"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/iv_translate_other"
-                    app:layout_constraintRight_toLeftOf="@id/iv_edit_other"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Doktorka" />
-
-
-                <ImageView
-                    android:id="@+id/iv_edit_other"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:onClick="onVoiceInputOther"
-                    android:src="@drawable/ic_mic_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/et_word_other"
+                    android:layout_marginRight="20dp"
+                    android:paddingStart="50dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:visibility="gone"
+                    app:layout_constraintLeft_toRightOf="@id/cl_other_card"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
 
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:paddingTop="20dp"
-                android:paddingRight="40dp"
-                android:paddingBottom="20dp">
+                    <ImageView
+                        android:id="@+id/iv_picture"
+                        android:layout_width="300dp"
+                        android:layout_height="150dp"
+                        android:background="@color/cardview_dark_background"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
 
-                <ImageView
-                    android:id="@+id/iv_translate_native"
+                    <ImageView
+                        android:id="@+id/iv_picture_delete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_delete"
+                        app:layout_constraintLeft_toRightOf="@+id/iv_picture"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <ImageView
+                        android:id="@+id/iv_picture_edit"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_edit_black_24dp"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_picture"
+                        app:layout_constraintLeft_toRightOf="@+id/iv_picture" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_native_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="40dp"
+                    android:paddingTop="20dp"
+                    android:paddingRight="40dp"
+                    android:paddingBottom="20dp">
+
+                    <ImageView
+                        android:id="@+id/iv_word_native"
+                        android:layout_width="0dp"
+                        android:layout_height="150dp"
+                        android:background="@{Card.cardStateNative.backColor}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/iv_word_native_edit"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/tv_card_native"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{Card.nativeName}"
+                        android:textAlignment="center"
+                        android:textColor="@{Card.cardStateOther.textColor}"
+                        android:textSize="20sp"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_word_native"
+                        app:layout_constraintLeft_toLeftOf="@id/iv_word_native"
+                        app:layout_constraintRight_toRightOf="@id/iv_word_native"
+                        app:layout_constraintTop_toTopOf="@id/iv_word_native"
+                        tools:text="Доктор" />
+
+
+                    <ImageView
+                        android:id="@+id/iv_word_native_edit"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:onClick="OnEditCardNative"
+                        android:src="@drawable/ic_edit_black_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/iv_word_native"
+                        app:layout_constraintRight_toRightOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_other_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="40dp"
+                    android:paddingTop="20dp"
+                    android:paddingRight="40dp"
+                    android:paddingBottom="20dp">
+
+                    <ImageView
+                        android:id="@+id/iv_word_other"
+                        android:layout_width="0dp"
+                        android:layout_height="150dp"
+                        android:background="@{Card.cardStateOther.backColor}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/iv_word_other_edit"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/tv_card_other"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textColor="@{Card.cardStateNative.textColor}"
+                        android:textSize="20sp"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_word_other"
+                        app:layout_constraintLeft_toLeftOf="@id/iv_word_other"
+                        app:layout_constraintRight_toRightOf="@id/iv_word_other"
+                        app:layout_constraintTop_toTopOf="@id/iv_word_other"
+                        tools:text="Doktorka" />
+
+
+                    <ImageView
+                        android:id="@+id/iv_word_other_edit"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:onClick="OnEditCardOther"
+                        android:src="@drawable/ic_edit_black_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/iv_word_other"
+                        app:layout_constraintRight_toRightOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="40dp"
+                    android:paddingTop="20dp"
+                    android:paddingRight="40dp"
+                    android:paddingBottom="20dp">
+
+
+                    <ImageView
+                        android:id="@+id/iv_translate_other"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="OnTranslateOther"
+                        android:src="@drawable/ic_translate"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/et_word_other"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <EditText
+                        android:id="@+id/et_word_other"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:hint="@string/input_text_other"
+                        android:maxLines="1"
+                        android:orientation="horizontal"
+                        android:text="@{Card.otherName}"
+                        android:textAlignment="center"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/iv_translate_other"
+                        app:layout_constraintRight_toLeftOf="@id/iv_edit_other"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Doktorka" />
+
+
+                    <ImageView
+                        android:id="@+id/iv_edit_other"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:onClick="onVoiceInputOther"
+                        android:src="@drawable/ic_mic_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/et_word_other"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="40dp"
+                    android:paddingTop="20dp"
+                    android:paddingRight="40dp"
+                    android:paddingBottom="20dp">
+
+
+                    <ImageView
+                        android:id="@+id/iv_translate_native"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="OnTranslateNative"
+                        android:src="@drawable/ic_translate"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/et_word_native"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <EditText
+                        android:id="@+id/et_word_native"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:hint="@string/input_text_native"
+                        android:maxLines="1"
+                        android:orientation="horizontal"
+                        android:text="@{Card.otherName}"
+                        android:textAlignment="center"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/iv_translate_native"
+                        app:layout_constraintRight_toLeftOf="@id/iv_edit_native"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Доктор" />
+
+
+                    <ImageView
+                        android:id="@+id/iv_edit_native"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:onClick="onVoiceInputNative"
+                        android:src="@drawable/ic_mic_24dp"
+                        app:layout_constraintBottom_toBottomOf="@id/et_word_native"
+                        app:layout_constraintLeft_toRightOf="@id/et_word_native"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/et_word_native"
+                        tools:text="Доктор" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="40dp"
+                    android:paddingTop="20dp"
+                    android:paddingRight="40dp"
+                    android:paddingBottom="20dp"
+                    android:visibility="gone">
+
+
+                    <ImageView
+                        android:id="@+id/iv_play_stop_voice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_play_arrow_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ProgressBar
+                        android:id="@+id/pb_voice"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layerType="hardware"
+                        android:orientation="horizontal"
+                        android:progress="2"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/iv_play_stop_voice"
+                        app:layout_constraintRight_toLeftOf="@id/iv_edit_voice"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <ImageView
+                        android:id="@+id/iv_edit_voice"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:src="@drawable/ic_edit_black_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/pb_voice"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="OnTranslateNative"
-                    android:src="@drawable/ic_translate"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/et_word_native"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_gravity="center"
+                    android:onClick="SaveWord"
+                    android:paddingTop="10dp"
+                    android:text="@android:string/ok"
+                    tools:text="ОК" />
 
-                <EditText
-                    android:id="@+id/et_word_native"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:hint="@string/input_text_native"
-                    android:maxLines="1"
-                    android:orientation="horizontal"
-                    android:textAlignment="center"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/iv_translate_native"
-                    app:layout_constraintRight_toLeftOf="@id/iv_edit_native"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Доктор" />
+            </LinearLayout>
 
 
-                <ImageView
-                    android:id="@+id/iv_edit_native"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:onClick="onVoiceInputNative"
-                    android:src="@drawable/ic_mic_24dp"
-                    app:layout_constraintBottom_toBottomOf="@id/et_word_native"
-                    app:layout_constraintLeft_toRightOf="@id/et_word_native"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/et_word_native"
-                    tools:text="Доктор" />
+        </ScrollView>
 
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:paddingTop="20dp"
-                android:paddingRight="40dp"
-                android:paddingBottom="20dp"
-                android:visibility="gone">
+</layout>
 
-
-                <ImageView
-                    android:id="@+id/iv_play_stop_voice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_play_arrow_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ProgressBar
-                    android:id="@+id/pb_voice"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layerType="hardware"
-                    android:orientation="horizontal"
-                    android:progress="2"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/iv_play_stop_voice"
-                    app:layout_constraintRight_toLeftOf="@id/iv_edit_voice"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <ImageView
-                    android:id="@+id/iv_edit_voice"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_edit_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/pb_voice"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:onClick="SaveWord"
-                android:paddingTop="10dp"
-                android:text="@android:string/ok"
-                tools:text="ОК" />
-
-        </LinearLayout>
-
-
-    </ScrollView>
-
-
-</LinearLayout>

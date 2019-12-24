@@ -17,10 +17,10 @@ import android.view.WindowManager
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import com.sedi.viktor.learnAll.Color
 import com.sedi.viktor.learnAll.R
-import com.sedi.viktor.learnAll.convertColorStringToInt
 import com.sedi.viktor.learnAll.data.DatabaseHelper
 import com.sedi.viktor.learnAll.data.WordItemDatabase
 import com.sedi.viktor.learnAll.data.interfaces.IActionCard
@@ -28,6 +28,7 @@ import com.sedi.viktor.learnAll.data.interfaces.TranslateResponseCallbackImpl
 import com.sedi.viktor.learnAll.data.models.WordItem
 import com.sedi.viktor.learnAll.data.models.WordItemRoomModel
 import com.sedi.viktor.learnAll.data.remote.YandexTranslater
+import com.sedi.viktor.learnAll.databinding.WordEditLayoutActivityBinding
 import com.sedi.viktor.learnAll.ui.BaseActivity
 import com.sedi.viktor.learnAll.ui.dialogs.DialogColorChooser
 import com.sedi.viktor.learnAll.ui.dialogs.MessageBox
@@ -41,8 +42,6 @@ import java.time.format.TextStyle
 
 class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallbackImpl,
     ChangeColorListener, ChangeStyleListener {
-
-    // TODO перейти на биндинг
 
     // Ovveride and callbacks
     override fun onColorChanged(color: Color) {
@@ -130,12 +129,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         when (modifyingItem) {
             ModifyingItem.CARD -> {
-                iv_word_other.setBackgroundColor(getColor(color!!.color))
-                wordItem.cardStateOther.backColor = color.name
+                wordItem.cardStateOther.backColor = color!!.name
             }
             ModifyingItem.TEXT -> {
-                tv_card_other.setTextColor(getColor(color!!.color))
-                wordItem.cardStateOther.textColor = color.name
+                wordItem.cardStateOther.textColor = color!!.name
             }
             ModifyingItem.NONE -> TODO()
         }
@@ -147,12 +144,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         when (modifyingItem) {
             ModifyingItem.CARD -> {
-                iv_word_native.setBackgroundColor(getColor(color!!.color))
-                wordItem.cardStateNative.backColor = color.name
+                wordItem.cardStateNative.backColor = color!!.name
             }
             ModifyingItem.TEXT -> {
-                tv_card_native.setTextColor(getColor(color!!.color))
-                wordItem.cardStateNative.textColor = color.name
+                wordItem.cardStateNative.textColor = color!!.name
             }
         }
 
@@ -165,8 +160,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         wordItem.nativeName = response
 
         iv_translate_native.isEnabled = true
-        et_word_native.post { et_word_native.setText(response) }
-        tv_card_native.post { tv_card_native.setText(response) }
+
 
     }
 
@@ -176,10 +170,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         sayText(response)
 
         wordItem.otherName = response
-
         iv_translate_other.isEnabled = true
-        et_word_other.post { et_word_other.setText(response) }
-        tv_card_other.post { tv_card_other.setText(response) }
 
     }
 
@@ -187,7 +178,11 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.word_edit_layout_activity)
+        val binding = DataBindingUtil.setContentView<WordEditLayoutActivityBinding>(
+            this,
+            R.layout.word_edit_layout_activity
+        )
+        binding.card = wordItem
 
         db = WordItemDatabase.invoke(this)
 
@@ -197,7 +192,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         initViewListeners()
-        initView()
         setupViews()
         yandexTranslater = YandexTranslater(this)
 
@@ -229,7 +223,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
                 wordItem.otherName = tv_card_other.text.toString()
 
-                if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(et_word_other.text)) {
+                if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(wordItem.otherName)) {
 
                     translateOther()
                 }
@@ -245,12 +239,12 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         nativeTextChangeListener = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
+
                 iv_translate_native.isEnabled = !TextUtils.isEmpty(et_word_native.text)
 
                 wordItem.nativeName = tv_card_native.text.toString()
 
-                if (direction == Direction.SPEAK_NATIVE && !TextUtils.isEmpty(tv_card_native.text)) {
-
+                if (direction == Direction.SPEAK_NATIVE && !TextUtils.isEmpty(wordItem.nativeName)) {
                     translateNative()
                 }
 
@@ -284,7 +278,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         iv_edit_other.isEnabled = false
 
 
-        tv_card_other.text = et_word_other.text.toString()
         wordItem.otherName = tv_card_other.text.toString()
 
 
@@ -293,7 +286,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         yandexTranslater.translate(
             "cs",
             "ru",
-            et_word_other.text.toString(),
+            wordItem.otherName,
             this@EditWordActivity,
             this@EditWordActivity
         )
@@ -313,16 +306,12 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         iv_edit_other.isEnabled = false
 
 
-
-        tv_card_native.text = et_word_native.text.toString()
-        wordItem.nativeName = tv_card_native.text.toString()
-
         direction = Direction.TRANSLATE_TO_OTHER
 
         yandexTranslater.translate(
             "ru",
             "cs",
-            et_word_native.text.toString(),
+            wordItem.nativeName,
             this@EditWordActivity,
             this@EditWordActivity
         )
@@ -396,13 +385,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             when (direction) {
                 Direction.SPEAK_NATIVE -> {
                     wordItem.nativeName = text
-                    tv_card_native.text = text
-                    et_word_native.setText(text)
+
                 }
                 Direction.SPEAK_OTHER -> {
                     wordItem.otherName = text
-                    tv_card_other.text = text
-                    et_word_other.setText(text)
                 }
                 else -> return
             }
@@ -471,13 +457,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     public fun SaveWord(view: View) {
 
 
-        wordItem.otherName = et_word_other.text.toString()
-        wordItem.nativeName = et_word_native.text.toString()
-
-        if (TextUtils.isEmpty(et_word_other.text.toString()) || TextUtils.isEmpty(wordItem.nativeName) || TextUtils.isEmpty(
-                wordItem.otherName
-            )
-        ) return
+        if (TextUtils.isEmpty(wordItem.nativeName) || TextUtils.isEmpty(wordItem.otherName)) return
 
 
 
@@ -489,7 +469,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
                 runOnUiThread {
                     toast("Успешно сохранено", Toast.LENGTH_LONG)
                     wordItem = WordItem()
-                    initView()
                 }
             }
 
@@ -508,62 +487,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     }
 
-    private fun initView() {
-
-
-        et_word_other.removeTextChangedListener(otherTextChangeListener)
-        et_word_native.removeTextChangedListener(nativeTextChangeListener)
-
-
-
-        et_word_other.setText(wordItem.otherName)
-        tv_card_other.text = wordItem.otherName
-        et_word_native.setText(wordItem.nativeName)
-        tv_card_native.text = wordItem.nativeName
-        modifyingItem = ModifyingItem.NONE
-        direction = Direction.DEFAULT
-        modifyingCard = ModifyingCard.NONE
-
-
-
-        iv_word_native.setBackgroundColor(
-            getColor(
-                convertColorStringToInt(
-                    wordItem.cardStateNative.backColor,
-                    defaultColor = Color.GRAY.color
-                )
-            )
-        )
-
-        iv_word_other.setBackgroundColor(
-            getColor(
-                convertColorStringToInt(
-                    wordItem.cardStateOther.backColor,
-                    defaultColor = Color.GRAY.color
-                )
-            )
-        )
-
-        // Осталось дописать сброс цвета для текста
-        tv_card_other.setTextColor(
-            convertColorStringToInt(
-                wordItem.cardStateNative.textColor,
-                defaultColor = Color.BLACK.color
-            )
-        )
-        tv_card_native.setTextColor(
-            convertColorStringToInt(
-                wordItem.cardStateOther.textColor,
-                defaultColor = Color.BLACK.color
-            )
-        )
-
-
-        et_word_other.addTextChangedListener(otherTextChangeListener)
-        et_word_native.addTextChangedListener(nativeTextChangeListener)
-
-
-    }
 
     private fun onDismisedColorChoosedDialog() {
         modifyingCard = ModifyingCard.NONE
