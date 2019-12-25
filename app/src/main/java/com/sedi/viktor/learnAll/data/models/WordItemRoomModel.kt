@@ -17,7 +17,7 @@ class WordItemRoomModel : Any() {
     @ColumnInfo(name = "card_native_back_color")
     var cardNativeBackGround: String = ""
     @ColumnInfo(name = "card_other_back_color")
-    var cardOtherBackGround: String = ""
+    var cardOtherBackground: String = ""
     @ColumnInfo(name = "card_other_text_color")
     var cardOtheTextColor: String = ""
     @ColumnInfo(name = "card_native_text_color")

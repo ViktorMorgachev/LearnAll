@@ -129,10 +129,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         when (modifyingItem) {
             ModifyingItem.CARD -> {
-                wordItem.cardStateOther.backColor = color!!.name
+                wordItem.getCardStateOther().setBackColor(color!!.name)
             }
             ModifyingItem.TEXT -> {
-                wordItem.cardStateOther.textColor = color!!.name
+                wordItem.getCardStateOther().setTextColor(color!!.name)
             }
             ModifyingItem.NONE -> TODO()
         }
@@ -144,11 +144,12 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         when (modifyingItem) {
             ModifyingItem.CARD -> {
-                wordItem.cardStateNative.backColor = color!!.name
+                wordItem.getCardStateOther().setBackColor(color!!.name)
             }
             ModifyingItem.TEXT -> {
-                wordItem.cardStateNative.textColor = color!!.name
+                wordItem.getCardStateNative().setTextColor(color!!.name)
             }
+            ModifyingItem.NONE -> TODO()
         }
 
 
@@ -157,9 +158,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     private fun initNative(response: String) {
 
-        wordItem.nativeName = response
+        wordItem.setNativeName(response)
 
         iv_translate_native.isEnabled = true
+        iv_translate_other.isEnabled = true
 
 
     }
@@ -169,8 +171,9 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         sayText(response)
 
-        wordItem.otherName = response
+        wordItem.setOtherName(response)
         iv_translate_other.isEnabled = true
+        iv_translate_native.isEnabled = true
 
     }
 
@@ -221,9 +224,9 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             override fun afterTextChanged(s: Editable?) {
                 iv_translate_other.isEnabled = !TextUtils.isEmpty(et_word_other.text)
 
-                wordItem.otherName = tv_card_other.text.toString()
+                wordItem.setOtherName(tv_card_other.text.toString())
 
-                if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(wordItem.otherName)) {
+                if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(wordItem.getOtherName())) {
 
                     translateOther()
                 }
@@ -242,9 +245,9 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
                 iv_translate_native.isEnabled = !TextUtils.isEmpty(et_word_native.text)
 
-                wordItem.nativeName = tv_card_native.text.toString()
+                wordItem.setNativeName(tv_card_native.text.toString())
 
-                if (direction == Direction.SPEAK_NATIVE && !TextUtils.isEmpty(wordItem.nativeName)) {
+                if (direction == Direction.SPEAK_NATIVE && !TextUtils.isEmpty(wordItem.getNativeName())) {
                     translateNative()
                 }
 
@@ -278,7 +281,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         iv_edit_other.isEnabled = false
 
 
-        wordItem.otherName = tv_card_other.text.toString()
+        wordItem.setOtherName(et_word_other.text.toString())
 
 
         direction = Direction.TRANSLATE_TO_NATIVE
@@ -286,7 +289,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         yandexTranslater.translate(
             "cs",
             "ru",
-            wordItem.otherName,
+            wordItem.getOtherName(),
             this@EditWordActivity,
             this@EditWordActivity
         )
@@ -305,19 +308,21 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         iv_edit_native.isEnabled = false
         iv_edit_other.isEnabled = false
 
+        wordItem.setNativeName(et_word_native.text.toString())
 
         direction = Direction.TRANSLATE_TO_OTHER
 
         yandexTranslater.translate(
             "ru",
             "cs",
-            wordItem.nativeName,
+            wordItem.getNativeName(),
             this@EditWordActivity,
             this@EditWordActivity
         )
     }
 
 
+    @SuppressWarnings
     fun onVoiceInputNative(view: View) {
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
             Toast.makeText(
@@ -341,6 +346,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     }
 
 
+    @SuppressWarnings
     fun onVoiceInputOther(view: View) {
 
 
@@ -384,11 +390,11 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             var text = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!![0]
             when (direction) {
                 Direction.SPEAK_NATIVE -> {
-                    wordItem.nativeName = text
+                    wordItem.setNativeName(text)
 
                 }
                 Direction.SPEAK_OTHER -> {
-                    wordItem.otherName = text
+                    wordItem.setOtherName(text)
                 }
                 else -> return
             }
@@ -406,6 +412,8 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         when (direction) {
             Direction.SPEAK_NATIVE -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ru")
             Direction.SPEAK_OTHER -> intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "cs")
+            else -> {//TODO
+            }
         }
 
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Скажи что хотел")
@@ -457,7 +465,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     public fun SaveWord(view: View) {
 
 
-        if (TextUtils.isEmpty(wordItem.nativeName) || TextUtils.isEmpty(wordItem.otherName)) return
+        if (TextUtils.isEmpty(wordItem.getNativeName()) || TextUtils.isEmpty(wordItem.getOtherName())) return
 
 
 

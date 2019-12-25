@@ -55,7 +55,7 @@ class WordsRepositoryAdapter(
                     view.context.theme
                 )
             )
-            wordItem.favourite = true
+            wordItem.setFavourite(true)
             clickCallback.onChangeFavorite(wordItem)
         }
 
@@ -66,7 +66,7 @@ class WordsRepositoryAdapter(
                     view.context.theme
                 )
             )
-            wordItem.favourite = false
+            wordItem.setFavourite(false)
             clickCallback.onChangeFavorite(wordItem)
         }
 

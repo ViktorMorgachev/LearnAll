@@ -5,7 +5,7 @@ import androidx.databinding.Bindable
 import com.sedi.viktor.learnAll.BR
 
 
-class WordItem (
+class WordItem(
     var primaryKey: Int = 0,
     private var learned: Boolean = false,
     private var otherName: String = "",
@@ -13,7 +13,7 @@ class WordItem (
     private var favourite: Boolean = false,
     private var cardStateNative: CardState = CardState(),
     private var cardStateOther: CardState = CardState()
-): BaseObservable() {
+) : BaseObservable() {
 
 
     constructor() : this(0, false, "", "", false, CardState(), CardState())
@@ -29,10 +29,40 @@ class WordItem (
     )
 
     @Bindable
-    fun setLearned(isLearned : Boolean){
+    fun setLearned(isLearned: Boolean) {
         learned = isLearned
         notifyPropertyChanged(BR.learned)
     }
+
+    @Bindable
+    fun setOtherName(name: String) {
+        otherName = name
+        notifyPropertyChanged(BR.otherName)
+    }
+
+
+    @Bindable
+    fun setNativeName(name: String) {
+        nativeName = name
+        notifyPropertyChanged(BR.nativeName)
+    }
+
+    @Bindable
+    fun setFavourite(isFavourite : Boolean){
+        favourite = isFavourite
+        notifyPropertyChanged(BR.favourite)
+    }
+
+
+    fun getLearned() : Boolean = learned
+    fun getOtherName() : String = otherName
+    fun getNativeName() : String = nativeName
+    fun getFavourite() : Boolean = favourite
+    fun getCardStateNative() : CardState = cardStateNative
+    fun getCardStateOther() : CardState = cardStateOther
+
+
+
 
 
 }

@@ -11,14 +11,14 @@ class DatabaseHelper {
         fun convertWordItemToRoomModel(wordItem: WordItem): WordItemRoomModel {
             val wordItemRoomModel = WordItemRoomModel().apply {
                 primaryKey = wordItem.primaryKey
-                learned = wordItem.learned
-                nativeName = wordItem.nativeName
-                otherName = wordItem.otherName
-                cardNativeBackGround = wordItem.cardStateNative.backColor
-                cardNativeTextColor = wordItem.cardStateNative.textColor
-                cardOtheTextColor = wordItem.cardStateOther.textColor
-                cardOtherBackGround = wordItem.cardStateOther.backColor
-                favourite = wordItem.favourite
+                learned = wordItem.getLearned()
+                nativeName = wordItem.getNativeName()
+                otherName = wordItem.getOtherName()
+                cardNativeBackGround = wordItem.getCardStateNative().getBackColor()
+                cardNativeTextColor = wordItem.getCardStateNative().getTextColor()
+                cardOtheTextColor = wordItem.getCardStateOther().getTextColor()
+                cardOtherBackground = wordItem.getCardStateOther().getBackColor()
+                favourite = wordItem.getFavourite()
             }
             return wordItemRoomModel
         }
@@ -36,7 +36,7 @@ class DatabaseHelper {
                     wordItemRoomModel.cardNativeTextColor
                 ),
                 CardState(
-                    wordItemRoomModel.cardOtherBackGround,
+                    wordItemRoomModel.cardOtherBackground,
                     wordItemRoomModel.cardOtheTextColor
                 )
             )
@@ -119,7 +119,11 @@ class DatabaseHelper {
             }).start()
         }
 
-        fun asynkDeleteWordItem(db: WordItemDatabase, wordItem: WordItem, iActionCard: IActionCard) {
+        fun asynkDeleteWordItem(
+            db: WordItemDatabase,
+            wordItem: WordItem,
+            iActionCard: IActionCard
+        ) {
 
             Thread(Runnable {
 
