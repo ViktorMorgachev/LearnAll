@@ -56,9 +56,9 @@ class TextRecognizer(
 
     private fun analizeCloud(image: Image, rotationDegrees: Int) {
 
-        // TODO Тут будем анализировать через облако
+
         val options = FirebaseVisionCloudTextRecognizerOptions.Builder()
-            .setLanguageHints(listOf("ru", "en", "cz")).build()
+            .setLanguageHints(listOf("ru", "en")).build()
 
 
         var rotation = degreesToFireBaseRotarion(rotationDegrees)

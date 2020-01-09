@@ -287,7 +287,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         direction = Direction.TRANSLATE_TO_NATIVE
 
         yandexTranslater.translate(
-            "cs",
+            "en",
             "ru",
             wordItem.getOtherName(),
             this@EditWordActivity,
@@ -314,7 +314,7 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
         yandexTranslater.translate(
             "ru",
-            "cs",
+            "en",
             wordItem.getNativeName(),
             this@EditWordActivity,
             this@EditWordActivity

@@ -11,7 +11,7 @@ open class BaseActivity : AppCompatActivity() {
     fun initTTS() {
         textToSpeech = TextToSpeech(this, TextToSpeech.OnInitListener {
             if (it == TextToSpeech.SUCCESS) {
-                val ttsLang = textToSpeech?.setLanguage(Locale("cs"))
+                val ttsLang = textToSpeech?.setLanguage(Locale("en"))
                 if (ttsLang == TextToSpeech.LANG_MISSING_DATA) {
                     toast("TTS Language is unsupported")
 
