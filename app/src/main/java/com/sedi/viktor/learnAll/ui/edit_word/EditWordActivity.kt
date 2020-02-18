@@ -43,7 +43,12 @@ import java.time.format.TextStyle
 class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallbackImpl,
     ChangeColorListener, ChangeStyleListener {
 
-    // Ovveride and callbacks
+
+    //Data
+    private var binding: WordEditLayoutActivityBinding? = null
+
+
+    // Overide and callbacks
     override fun onColorChanged(color: Color) {
 
         when (modifyingCard) {
@@ -60,8 +65,11 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     override fun onSuccess(response: String) {
 
-        iv_edit_native.isEnabled = true
-        iv_edit_other.isEnabled = true
+        runOnUiThread {
+            iv_edit_native.isEnabled = true
+            iv_edit_other.isEnabled = true
+        }
+
 
         val jObject = JSONObject(response)
         val jArray = jObject.getJSONArray("text")
@@ -87,8 +95,11 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     override fun onFaillure(e: Exception) {
 
-        iv_edit_native.isEnabled = true
-        iv_edit_other.isEnabled = true
+        runOnUiThread {
+            iv_edit_native.isEnabled = true
+            iv_edit_other.isEnabled = true
+        }
+
 
         if (e.message != null)
             Log.e("LearnAll", e.message!!)
@@ -159,10 +170,12 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
     private fun initNative(response: String) {
 
         wordItem.setNativeName(response)
+        binding?.executePendingBindings()
 
-        iv_translate_native.isEnabled = true
-        iv_translate_other.isEnabled = true
-
+        runOnUiThread {
+            iv_translate_native.isEnabled = true
+            iv_translate_other.isEnabled = true
+        }
 
     }
 
@@ -172,20 +185,23 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
         sayText(response)
 
         wordItem.setOtherName(response)
-        iv_translate_other.isEnabled = true
-        iv_translate_native.isEnabled = true
 
+        runOnUiThread {
+            iv_translate_other.isEnabled = true
+            iv_translate_native.isEnabled = true
+        }
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = DataBindingUtil.setContentView<WordEditLayoutActivityBinding>(
+        binding = DataBindingUtil.setContentView(
             this,
             R.layout.word_edit_layout_activity
         )
-        binding.card = wordItem
+        binding?.card = wordItem
+        binding?.executePendingBindings()
 
         db = WordItemDatabase.invoke(this)
 
@@ -227,7 +243,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
                 wordItem.setOtherName(tv_card_other.text.toString())
 
                 if (direction == Direction.SPEAK_OTHER && !TextUtils.isEmpty(wordItem.getOtherName())) {
-
                     translateOther()
                 }
 
@@ -261,11 +276,8 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             }
         }
 
-
-
         et_word_other.addTextChangedListener(otherTextChangeListener)
         et_word_native.addTextChangedListener(nativeTextChangeListener)
-
 
     }
 
@@ -277,15 +289,13 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     private fun translateOther() {
 
-        iv_edit_native.isEnabled = false
-        iv_edit_other.isEnabled = false
-
+        runOnUiThread {
+            iv_edit_native.isEnabled = false
+            iv_edit_other.isEnabled = false
+        }
 
         wordItem.setOtherName(et_word_other.text.toString())
-
-
         direction = Direction.TRANSLATE_TO_NATIVE
-
         yandexTranslater.translate(
             "en",
             "ru",
@@ -305,8 +315,10 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
 
     private fun translateNative() {
 
-        iv_edit_native.isEnabled = false
-        iv_edit_other.isEnabled = false
+        runOnUiThread {
+            iv_edit_native.isEnabled = false
+            iv_edit_other.isEnabled = false
+        }
 
         wordItem.setNativeName(et_word_native.text.toString())
 
@@ -391,7 +403,6 @@ class EditWordActivity : BaseActivity(), LifecycleOwner, TranslateResponseCallba
             when (direction) {
                 Direction.SPEAK_NATIVE -> {
                     wordItem.setNativeName(text)
-
                 }
                 Direction.SPEAK_OTHER -> {
                     wordItem.setOtherName(text)
